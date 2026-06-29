@@ -822,15 +822,23 @@ def page_about():
         finding_card(f"{rej:,}", "Near-miss pairs rejected", "zero false positives in the final set")
 
     st.markdown('<div style="height:32px"></div>', unsafe_allow_html=True)
-    section_label("The Team")
-    for name, role in [
-        ("Harsha Ghandikota", "Research concept, system design · Duke University MEM 2026"),
-        ("Aadish Sanghvi", "Critical review and commentary"),
-        ("Sohan Kumar Rustumpet", "Critical review and commentary"),
-        ("Nitin Kumar Rustumpet", "Critical review and commentary"),
-        ("Claude Sonnet (Anthropic)", "Autonomous analysis and report generation"),
-    ]:
-        st.markdown(team_card(name, role), unsafe_allow_html=True)
+    section_label("Built By")
+    st.markdown(team_card("Harsha Ghandikota",
+                          "Sole builder — research, system design & engineering · "
+                          "Duke University, Master of Engineering Management student"),
+                unsafe_allow_html=True)
+    st.markdown(team_card("Claude Sonnet (Anthropic)",
+                          "Autonomous analysis and report generation"), unsafe_allow_html=True)
+
+    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+    section_label("Acknowledgments")
+    st.markdown(
+        '<div style="font-size:13px;line-height:1.85;color:#999;max-width:760px;font-weight:300;'
+        'font-family:Inter,sans-serif">Thanks to <span style="color:#e8e8e8">Aadish Sanghvi</span>, '
+        '<span style="color:#e8e8e8">Sohan Kumar Rustumpet</span>, and '
+        '<span style="color:#e8e8e8">Nitin Kumar Rustumpet</span> — the friends in the group chat '
+        'that started this, and early validators who pressure-tested the idea and gave feedback '
+        'along the way.</div>', unsafe_allow_html=True)
 
 
 def page_methodology():
