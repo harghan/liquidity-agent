@@ -99,6 +99,10 @@ div[data-testid="stStatus"], [data-testid="stExpander"] { background: #0d0d0d !i
 [data-testid="stSelectbox"] > div > div { background: #0d0d0d !important; border: 1px solid #1a1a1a !important; border-radius: 0 !important; color: #e8e8e8 !important; }
 .streamlit-expanderHeader { background: #0d0d0d !important; border: 1px solid #1a1a1a !important; border-radius: 0 !important; font-family: 'DM Mono', monospace !important; font-size: 11px !important; letter-spacing: 1px !important; color: #888 !important; }
 .js-plotly-plot { border: 1px solid #141414 !important; }
+/* Let charts pan the page vertically on touch instead of trapping scroll */
+.js-plotly-plot .plotly { touch-action: pan-y !important; overscroll-behavior: contain !important; }
+[data-testid="stPlotlyChart"] { touch-action: pan-y !important; pointer-events: auto !important; }
+[data-testid="stPlotlyChart"] .plotly-graph-div { touch-action: pan-y !important; }
 hr { border: none !important; border-top: 1px solid #141414 !important; margin: 2rem 0 !important; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: #080808; }
@@ -627,14 +631,24 @@ def page_live():
     page_header("Liquidity Agent", "Cross-Platform Prediction Market Intelligence",
                 "Real-time orderbook analysis · Polymarket × Kalshi · 300 markets")
 
+    if "analysis_running" not in st.session_state:
+        st.session_state.analysis_running = False
+
     c1, c2, c3 = st.columns([1, 1, 1])
     with c2:
-        run = st.button("Run Live Analysis", type="primary", use_container_width=True)
-    if run:
-        a = run_pipeline_live()
-        if a:
-            st.session_state["analysis"] = a
+        if st.button("Run Live Analysis", type="primary", use_container_width=True):
+            # Flag the run; clear cached results so the pipeline executes once.
+            st.session_state.analysis_running = True
+            st.session_state["analysis"] = None
             st.session_state.pop("narrative", None)
+
+    # Run the pipeline only when flagged and not already cached — so navigating
+    # away and back never re-runs it (Streamlit re-executes the script on every
+    # interaction; the session-state cache is the fix).
+    if st.session_state.analysis_running and not st.session_state.get("analysis"):
+        result = run_pipeline_live()
+        st.session_state["analysis"] = result
+        st.session_state.analysis_running = False
 
     a = st.session_state.get("analysis")
     if not a:
@@ -662,12 +676,14 @@ def page_live():
     st.markdown('<div style="height:28px"></div>', unsafe_allow_html=True)
     section_label("Price Impact", "Where the Orderbook Breaks",
                   "Mean volume-weighted impact vs displayed mid, $500 → $100k")
-    st.plotly_chart(price_impact_curve(a), use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(price_impact_curve(a), use_container_width=True,
+                    config={"displayModeBar": False, "scrollZoom": False, "staticPlot": False, "responsive": True})
 
     st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
     section_label("Execution Cost", "Avoidable Slippage by Market",
                   "Savings from routing a $10,000 order to the cheaper venue")
-    st.plotly_chart(slippage_bar(a), use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(slippage_bar(a), use_container_width=True,
+                    config={"displayModeBar": False, "scrollZoom": False, "staticPlot": False, "responsive": True})
 
     st.markdown('<div style="height:28px"></div>', unsafe_allow_html=True)
     section_label("Autonomous Research Narrative")
@@ -889,14 +905,20 @@ with st.sidebar:
     st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
 
     # Session-state button navigation (robust vs custom CSS, unlike st.radio).
+    # Active page renders as a styled label; others stay clickable buttons.
     _pages = ["Live Analysis", "Markets", "About", "Methodology"]
     _icons = ["⬤", "◈", "◎", "◻"]
     for _icon, _p in zip(_icons, _pages):
-        _active = st.session_state.page == _p
-        if st.button(f"{_icon}  {_p.upper()}", key=f"nav_{_p}", use_container_width=True,
-                     type="primary" if _active else "secondary"):
-            st.session_state.page = _p
-            st.rerun()
+        label = f"{_icon}  {_p.upper()}"
+        if st.session_state.page == _p:
+            st.markdown(
+                f'<div style="padding:10px 24px;font-family:\'DM Mono\',monospace;font-size:10px;'
+                f'letter-spacing:2px;color:#c8a951;border-left:2px solid #c8a951;background:#0d0d0d;'
+                f'cursor:default">{label}</div>', unsafe_allow_html=True)
+        else:
+            if st.button(label, key=f"nav_{_p}", use_container_width=True):
+                st.session_state.page = _p
+                st.rerun()
 
     st.markdown("""
     <div style="padding:16px 24px;border-top:1px solid #141414;margin-top:24px">
