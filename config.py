@@ -209,9 +209,9 @@ COLOR_SAFE = "#2d6a4f"
 FONT_BODY = "Helvetica"
 FONT_BOLD = "Helvetica-Bold"
 
-AUTHOR_CREDIT_LINE_1 = "Research concept and design: Harsha Ghandikota, Duke University (MEM 2026)"
-AUTHOR_CREDIT_LINE_2 = "Critical review and commentary: Sohan & Nitin"
-AUTHOR_CREDIT_LINE_3 = "Autonomous analysis and report generation: Claude Sonnet (Anthropic)"
+AUTHOR_CREDIT_LINE_1 = ("Research concept and design: Harsha Ghandikota, "
+                        "Duke University, Master of Engineering Management student")
+AUTHOR_CREDIT_LINE_2 = "Autonomous analysis and report generation: Claude Sonnet (Anthropic)"
 DATA_SOURCE = "Polymarket (Gamma + CLOB) & Kalshi (trade-api v2)"
 REPORT_DISCLAIMER = ("This memo is generated autonomously by the Liquidity Agent. "
                      "It does not constitute investment advice.")
