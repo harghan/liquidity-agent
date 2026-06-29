@@ -824,8 +824,8 @@ def page_about():
     st.markdown('<div style="height:32px"></div>', unsafe_allow_html=True)
     section_label("Built By")
     st.markdown(team_card("Harsha Ghandikota",
-                          "Sole builder — research, system design & engineering · "
-                          "Duke University, Master of Engineering Management student"),
+                          "Quantitative research, system design & engineering — conceived and "
+                          "built end to end · Duke University, Master of Engineering Management candidate"),
                 unsafe_allow_html=True)
     st.markdown(team_card("Claude Sonnet (Anthropic)",
                           "Autonomous analysis and report generation"), unsafe_allow_html=True)
