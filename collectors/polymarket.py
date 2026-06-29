@@ -122,6 +122,7 @@ def _normalize(market: dict, token_id: str) -> NormalizedMarket:
         liquidity=_f("liquidityNum"),
         displayed_prob=displayed,
         url=f"https://polymarket.com/event/{slug}" if slug else None,
+        polymarket_slug=str(slug) if slug else None,
         book=None,  # populated lazily by fetch_book()
         extra={
             "gamma_id": market.get("id"),

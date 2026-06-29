@@ -87,6 +87,10 @@ class NormalizedMarket:
     liquidity: float = 0.0        # resting liquidity reported by the platform
     displayed_prob: Optional[float] = None  # platform-displayed implied probability
     url: Optional[str] = None
+    # Native platform identifiers, carried through to matched pairs so the UI can
+    # deep-link to each venue's trade page.
+    polymarket_slug: Optional[str] = None   # Polymarket Gamma `slug`
+    kalshi_ticker: Optional[str] = None      # Kalshi market `ticker`
     book: Optional[OrderBook] = None
     extra: Dict[str, object] = field(default_factory=dict)
 

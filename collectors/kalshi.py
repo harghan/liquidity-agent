@@ -134,6 +134,7 @@ def _normalize(market: dict) -> NormalizedMarket:
         liquidity=_f("liquidity"),
         displayed_prob=displayed,
         url=f"https://kalshi.com/markets/{market.get('event_ticker') or ticker}",
+        kalshi_ticker=ticker,
         book=None,  # populated lazily by fetch_book()
         extra={
             "event_ticker": market.get("event_ticker"),
