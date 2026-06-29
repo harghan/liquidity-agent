@@ -1,0 +1,19 @@
+# Secrets — never commit
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Logs
+logs/
+
+# Generated data artifacts (the PDF report is kept; bulky JSON is not)
+outputs/*.json
+
+# OS
+.DS_Store
+.claude/settings.local.json
