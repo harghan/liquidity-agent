@@ -34,6 +34,12 @@ st.markdown("""
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* ── VIEWPORT & TOUCH ───────────────────────── */
+html { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; scroll-behavior: smooth; }
+* { -webkit-tap-highlight-color: rgba(200,169,81,0.1); touch-action: manipulation; }
+body, .main { overflow-x: hidden !important; max-width: 100vw !important; }
+[data-testid="column"], [data-testid="metric-container"], .stButton > button { transition: all 0.2s ease !important; }
+
 html, body, [data-testid="stAppViewContainer"],
 [data-testid="stApp"], .main, .block-container {
     background-color: #080808 !important;
@@ -52,20 +58,19 @@ html, body, [data-testid="stAppViewContainer"],
 
 [data-testid="stSidebar"] { background: #050505 !important; border-right: 1px solid #141414 !important; padding-top: 0 !important; }
 [data-testid="stSidebar"] > div:first-child { padding: 0 !important; }
-section[data-testid="stSidebar"] .stRadio > label { display: none !important; }
-section[data-testid="stSidebar"] .stRadio > div { gap: 0 !important; }
-section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] { gap: 0 !important; }
-section[data-testid="stSidebar"] .stRadio label {
-    display: flex !important; padding: 12px 24px !important; font-size: 11px !important;
-    letter-spacing: 2px !important; text-transform: uppercase !important; color: #555 !important;
-    cursor: pointer !important; font-family: 'DM Mono', monospace !important;
-    border-left: 2px solid transparent !important; transition: all 0.15s !important; font-weight: 400 !important;
+/* Sidebar nav buttons (session-state navigation, not radio) */
+[data-testid="stSidebar"] .stButton > button {
+    text-align: left !important; justify-content: flex-start !important; padding: 10px 24px !important;
+    border: none !important; border-left: 2px solid transparent !important; border-radius: 0 !important;
+    color: #555 !important; font-size: 10px !important; letter-spacing: 2px !important;
+    width: 100% !important; background: transparent !important;
 }
-section[data-testid="stSidebar"] .stRadio label:hover { color: #999 !important; background: #0d0d0d !important; }
-section[data-testid="stSidebar"] .stRadio label:has(input:checked) {
+[data-testid="stSidebar"] .stButton > button:hover {
+    color: #999 !important; background: #0d0d0d !important; border-left-color: #333 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"] {
     color: #c8a951 !important; border-left-color: #c8a951 !important; background: #0d0d0d !important;
 }
-section[data-testid="stSidebar"] [data-baseweb="radio"] > div:first-child { display: none !important; }
 
 [data-testid="metric-container"] { background: #0d0d0d !important; border: 1px solid #1a1a1a !important; border-radius: 0 !important; padding: 1.5rem 1.75rem !important; }
 [data-testid="stMetricLabel"] { font-size: 9px !important; letter-spacing: 2.5px !important; text-transform: uppercase !important; color: #c8a951 !important; font-family: 'DM Mono', monospace !important; }
@@ -80,6 +85,12 @@ section[data-testid="stSidebar"] [data-baseweb="radio"] > div:first-child { disp
 .stButton > button:hover { border-color: #c8a951 !important; color: #c8a951 !important; background: rgba(200,169,81,0.04) !important; }
 .stButton > button[kind="primary"] { background: #c8a951 !important; border-color: #c8a951 !important; color: #080808 !important; font-weight: 500 !important; }
 .stButton > button[kind="primary"]:hover { background: #d4b862 !important; }
+[data-testid="stDownloadButton"] > button {
+    background: #c8a951 !important; border: 1px solid #c8a951 !important; color: #080808 !important;
+    border-radius: 0 !important; font-family: 'DM Mono', monospace !important; font-size: 10px !important;
+    letter-spacing: 2.5px !important; text-transform: uppercase !important; padding: 0.65rem 1.75rem !important; font-weight: 500 !important;
+}
+[data-testid="stDownloadButton"] > button:hover { background: #d4b862 !important; }
 
 .stProgress > div > div > div { background: #c8a951 !important; border-radius: 0 !important; }
 .stProgress > div > div { background: #141414 !important; border-radius: 0 !important; height: 2px !important; }
@@ -99,6 +110,29 @@ hr { border: none !important; border-top: 1px solid #141414 !important; margin: 
 [data-testid="column"]:last-child { padding-right: 0 !important; }
 .stMarkdown p { color: #999 !important; line-height: 1.75 !important; font-size: 14px !important; }
 .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { font-family: 'Inter', sans-serif !important; font-weight: 500 !important; color: #e8e8e8 !important; }
+
+/* ── RESPONSIVE BREAKPOINTS ─────────────────── */
+@media screen and (max-width: 1024px) {
+    .block-container { padding: 0 16px 64px !important; }
+    [data-testid="stSidebar"] { min-width: 200px !important; max-width: 200px !important; }
+    [data-testid="column"] { padding: 0 3px !important; }
+}
+@media screen and (max-width: 768px) {
+    .main .block-container { padding: 0 10px 56px !important; max-width: 100vw !important; }
+    [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; gap: 1px !important; }
+    [data-testid="column"] { min-width: calc(50% - 1px) !important; flex: 1 1 calc(50% - 1px) !important; padding: 0 !important; }
+    [data-testid="stMetricValue"] { font-size: 1.4rem !important; }
+    [data-testid="metric-container"] { padding: 1rem !important; }
+    .stMarkdown p { font-size: 13px !important; }
+    .js-plotly-plot { width: 100% !important; }
+    .stButton > button { width: 100% !important; padding: 0.85rem 1rem !important; }
+    [data-testid="stSidebar"][aria-expanded="false"] { margin-left: -244px !important; }
+    [data-testid="collapsedControl"] { display: flex !important; top: 1rem !important; left: 1rem !important; }
+}
+@media screen and (max-width: 480px) {
+    [data-testid="column"] { min-width: 100% !important; flex: 1 1 100% !important; }
+    [data-testid="stMetricValue"] { font-size: 1.25rem !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -266,10 +300,10 @@ def run_pipeline_live():
 # ---------------------------------------------------------------------------
 def page_header(label, title, subtitle=""):
     st.markdown(f"""
-    <div style="padding:40px 0 28px;border-bottom:1px solid #141414;margin-bottom:32px">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:{GOLD};margin-bottom:10px;text-transform:uppercase">{label}</div>
-        <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:500;color:#fff;letter-spacing:-0.5px;line-height:1.2">{title}</div>
-        {f'<div style="font-size:13px;color:#444;margin-top:8px;font-weight:300">{subtitle}</div>' if subtitle else ''}
+    <div style="padding:32px 0 28px;border-bottom:1px solid #141414;margin-bottom:28px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:{GOLD};margin-bottom:8px;text-transform:uppercase">{label}</div>
+        <div style="font-family:'Inter',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:500;color:#fff;letter-spacing:-0.5px;line-height:1.2;margin-bottom:{'8px' if subtitle else '0'}">{title}</div>
+        {f'<div style="font-size:clamp(11px,1.5vw,13px);color:#444;margin-top:6px;font-weight:300">{subtitle}</div>' if subtitle else ''}
     </div>
     """, unsafe_allow_html=True)
 
@@ -283,6 +317,62 @@ def kpi_card(label, value, sub="", accent="#ffffff"):
         {f'<div style="font-size:11px;color:#444;margin-top:8px;font-family:DM Mono,monospace">{sub}</div>' if sub else ''}
     </div>
     """
+
+
+def render_kpis(total_slippage, n_markets, n_rejected, lqi_gap, pm_lqi, kx_lqi, max_diverg, max_diverg_market):
+    arrow = "▲" if lqi_gap >= 0 else "▼"
+    gap_color = "#4ade80" if lqi_gap >= 0 else "#f87171"
+
+    def cell(label, value, sub, accent):
+        return (f'<div style="background:#0d0d0d;border:1px solid #141414;padding:20px 24px;position:relative;overflow:hidden">'
+                f'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,{GOLD},transparent)"></div>'
+                f'<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:2.5px;color:{GOLD};text-transform:uppercase;margin-bottom:10px">{label}</div>'
+                f'<div style="font-family:\'DM Mono\',monospace;font-size:clamp(1.5rem,3vw,2.25rem);font-weight:300;color:{accent};letter-spacing:-1px;line-height:1">{value}</div>'
+                f'<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:#444;margin-top:8px">{sub}</div></div>')
+
+    st.markdown(
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;margin-bottom:24px">'
+        + cell("Total avoidable slippage", f"${total_slippage:,.0f}", f"$10k notional · {n_markets} pairs", GOLD)
+        + cell("Markets analysed", str(n_markets), f"from {n_rejected:,} evaluated pairs", "#ffffff")
+        + cell("Mean LQI gap", f"{arrow} {abs(lqi_gap):.1f}", f"PM {pm_lqi:.1f} vs KX {kx_lqi:.1f}", gap_color)
+        + cell("Max divergence", f"{max_diverg:,.0f} bps", max_diverg_market, "#f87171")
+        + '</div>', unsafe_allow_html=True)
+
+
+def render_pdf_section(a):
+    from datetime import datetime
+    section_label("Institutional Report", "Nine-Page Research Memo",
+                  "Claude-authored narrative rendered to a professional PDF")
+    pdf_path = config.OUTPUT_DIR / f"liquidity_report_{a['run_date']}.pdf"
+
+    c1, c2, _ = st.columns([2, 1, 2])
+    gen = c1.button("↓ Generate Research Report", use_container_width=True)
+    regen = c2.button("↻ Regenerate", use_container_width=True)
+
+    if gen or regen:
+        if regen or not pdf_path.exists():
+            if not config.ANTHROPIC_API_KEY:
+                st.markdown('<div style="color:#444;font-size:12px;font-family:DM Mono,monospace">'
+                            'Set ANTHROPIC_API_KEY in .env to author the narrative.</div>', unsafe_allow_html=True)
+            with st.spinner("Generating institutional research report..."):
+                try:
+                    from agent import report_writer
+                    # Reuse the in-session analysis — no data pipeline re-run.
+                    report_writer.generate_pdf(a, pdf_path)
+                except Exception as exc:  # noqa: BLE001
+                    st.error(f"Report generation failed: {exc}")
+
+    if pdf_path.exists():
+        import re as _re
+        data = pdf_path.read_bytes()
+        pages = len(_re.findall(rb"/Type\s*/Page[^s]", data)) or "—"
+        ts = datetime.fromtimestamp(pdf_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+        st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:11px;color:#4ade80;margin:14px 0 10px">'
+                    f'✓ Report ready — {pages} pages · {len(data)/1024:.0f} KB · generated {ts}</div>',
+                    unsafe_allow_html=True)
+        st.download_button("↓ Download Research Report (PDF)", data,
+                           file_name=f"liquidity_report_{a['run_date']}.pdf",
+                           mime="application/pdf", use_container_width=False)
 
 
 def section_label(label, title="", muted=""):
@@ -318,42 +408,41 @@ def market_card(pair):
     border_color = GOLD if cheaper == "KX" else "#1e1e1e"
 
     return f"""
-    <div style="background:#0d0d0d;border:1px solid {border_color};margin-bottom:8px;padding:24px 28px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:0;left:0;bottom:0;width:2px;background:{GOLD if cheaper=='KX' else '#333'}"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+    <div style="background:#0d0d0d;border:1px solid {border_color};margin-bottom:8px;padding:20px 24px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;bottom:0;width:2px;background:{GOLD if cheaper=='KX' else '#1e1e1e'}"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px">
             <div>
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
                     <span style="background:{cat_bg};color:{cat_fg};font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;padding:3px 8px">{cat}</span>
                     <span style="font-family:'DM Mono',monospace;font-size:9px;color:#444;letter-spacing:1px">conf: {confidence:.3f}</span>
                 </div>
-                <div style="font-size:17px;font-weight:500;color:#fff;font-family:'Inter',sans-serif;letter-spacing:-0.3px">{name}</div>
+                <div style="font-size:16px;font-weight:500;color:#fff;font-family:'Inter',sans-serif;letter-spacing:-0.3px">{name}</div>
             </div>
-            <div style="text-align:right">
-                <div style="font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:300;color:{GOLD};letter-spacing:-0.5px">${avoidable:,.0f}</div>
+            <div style="text-align:right;flex-shrink:0">
+                <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:300;color:{GOLD};letter-spacing:-0.5px">${avoidable:,.0f}</div>
                 <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:#444;margin-top:2px">AVOIDABLE SLIPPAGE</div>
             </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;margin-bottom:16px">
-            <div style="padding:16px 20px 16px 0">
-                <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:#555;margin-bottom:10px">POLYMARKET</div>
-                <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:300;color:#fff;margin-bottom:6px">{pm_mid*100:.2f}¢</div>
-                <div style="font-size:11px;color:{pm_imp_color};margin-bottom:12px;font-family:'DM Mono',monospace">{pm_imp:.0f} bps impact · LQI {pm_lqi:.1f}</div>
-                <a href="{pm_url}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:{GOLD};text-decoration:none;border:1px solid {GOLD};padding:5px 14px;display:inline-block">TRADE →</a>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:14px">
+            <div style="background:#080808;padding:14px 16px">
+                <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:#555;margin-bottom:8px">POLYMARKET</div>
+                <div style="font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:300;color:#fff;margin-bottom:4px">{pm_mid*100:.2f}¢</div>
+                <div style="font-size:10px;color:{pm_imp_color};margin-bottom:10px;font-family:'DM Mono',monospace">{pm_imp:.0f} bps · LQI {pm_lqi:.1f}</div>
+                <a href="{pm_url}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;color:{GOLD};text-decoration:none;border:1px solid {GOLD};padding:4px 12px;display:inline-block;white-space:nowrap">TRADE →</a>
             </div>
-            <div style="background:#141414"></div>
-            <div style="padding:16px 0 16px 20px">
-                <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:#555;margin-bottom:10px">KALSHI</div>
-                <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:300;color:#fff;margin-bottom:6px">{kx_mid*100:.2f}¢</div>
-                <div style="font-size:11px;color:{kx_imp_color};margin-bottom:12px;font-family:'DM Mono',monospace">{kx_imp:.0f} bps impact · LQI {kx_lqi:.1f}</div>
-                <a href="{kx_url}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#888;text-decoration:none;border:1px solid #1e1e1e;padding:5px 14px;display:inline-block">TRADE →</a>
+            <div style="background:#080808;padding:14px 16px;border-left:1px solid #141414">
+                <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:#555;margin-bottom:8px">KALSHI</div>
+                <div style="font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:300;color:#fff;margin-bottom:4px">{kx_mid*100:.2f}¢</div>
+                <div style="font-size:10px;color:{kx_imp_color};margin-bottom:10px;font-family:'DM Mono',monospace">{kx_imp:.0f} bps · LQI {kx_lqi:.1f}</div>
+                <a href="{kx_url}" target="_blank" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#888;text-decoration:none;border:1px solid #1e1e1e;padding:4px 12px;display:inline-block;white-space:nowrap">TRADE →</a>
             </div>
         </div>
-        <div style="border-top:1px solid #141414;padding-top:12px;font-family:'DM Mono',monospace;font-size:10px;color:#444">
-            <span style="margin-right:20px">$10k: <span style="color:{pm_imp_color}">{pm_imp:.0f}</span> PM · <span style="color:{kx_imp_color}">{kx_imp:.0f}</span> KX</span>
-            <span style="margin-right:20px">·</span>
-            <span style="margin-right:20px">Divergence: <span style="color:{GOLD if divergence > 100 else '#555'}">{divergence:.0f} bps</span></span>
-            <span style="margin-right:20px">·</span>
-            <span>Route: <span style="color:{cheaper_color}">{cheaper_label.upper()}</span></span>
+        <div style="display:flex;gap:12px;border-top:1px solid #141414;padding-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:#444;flex-wrap:wrap">
+            <span>$10k: <span style="color:{pm_imp_color}">{pm_imp:.0f}</span> PM · <span style="color:{kx_imp_color}">{kx_imp:.0f}</span> KX</span>
+            <span style="color:#1e1e1e">·</span>
+            <span>Div: <span style="color:{GOLD if divergence > 100 else '#555'}">{divergence:.0f} bps</span></span>
+            <span style="color:#1e1e1e">·</span>
+            <span>Route: <span style="color:{cheaper_color}">{'PM' if cheaper=='PM' else 'KX'}</span></span>
         </div>
     </div>
     """
@@ -426,17 +515,18 @@ def render_narrative(text):
 # ---------------------------------------------------------------------------
 def style_fig(fig, height=460):
     fig.update_layout(
-        paper_bgcolor="#0d0d0d", plot_bgcolor="#0d0d0d", height=height,
+        paper_bgcolor="#0d0d0d", plot_bgcolor="#0d0d0d", height=height, autosize=True,
         font=dict(family="DM Mono, monospace", color="#666", size=10),
-        margin=dict(l=10, r=16, t=20, b=10),
+        margin=dict(l=10, r=16, t=36, b=10),
         legend=dict(bgcolor="rgba(0,0,0,0)", bordercolor="#141414", borderwidth=1,
-                    font=dict(size=10, color="#888")),
+                    font=dict(size=10, color="#888"),
+                    orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hoverlabel=dict(font=dict(family="DM Mono, monospace")),
     )
     fig.update_xaxes(gridcolor="#141414", linecolor="#141414", tickcolor="#141414",
-                     zerolinecolor="#141414")
+                     zerolinecolor="#141414", automargin=True)
     fig.update_yaxes(gridcolor="#141414", linecolor="#141414", tickcolor="#141414",
-                     zerolinecolor="#141414")
+                     zerolinecolor="#141414", automargin=True)
     return fig
 
 
@@ -560,17 +650,14 @@ def page_live():
     kx_lqi = _g(a, "platform_stats", "Kalshi", "mean_lqi") or 0
 
     st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
-    k1, k2, k3, k4 = st.columns(4)
-    k1.markdown(kpi_card("Total avoidable slippage", f"${cost.get('total_avoidable_slippage_10k', 0):,.0f}",
-                         f"$10k notional · {uni.get('compared_pairs', 0)} pairs", GOLD), unsafe_allow_html=True)
-    k2.markdown(kpi_card("Markets analysed", str(uni.get("compared_pairs", 0)),
-                         f"from {uni.get('near_miss_rejections', 0):,} evaluated pairs"), unsafe_allow_html=True)
-    arrow = "▲" if gap >= 0 else "▼"
-    k3.markdown(kpi_card("Mean LQI gap", f"{arrow} {abs(gap):.1f}",
-                         f"PM {pm_lqi:.1f} vs KX {kx_lqi:.1f}", "#4ade80" if gap >= 0 else "#f87171"),
-                unsafe_allow_html=True)
-    k4.markdown(kpi_card("Max divergence", f"{maxd.get('bps', 0) or 0:,.0f} bps",
-                         (maxd.get("subject") or "")[:22], "#f87171"), unsafe_allow_html=True)
+    render_kpis(
+        total_slippage=cost.get("total_avoidable_slippage_10k", 0) or 0,
+        n_markets=uni.get("compared_pairs", 0),
+        n_rejected=uni.get("near_miss_rejections", 0),
+        lqi_gap=gap, pm_lqi=pm_lqi, kx_lqi=kx_lqi,
+        max_diverg=maxd.get("bps", 0) or 0,
+        max_diverg_market=(maxd.get("subject") or "")[:22],
+    )
 
     st.markdown('<div style="height:28px"></div>', unsafe_allow_html=True)
     section_label("Price Impact", "Where the Orderbook Breaks",
@@ -601,6 +688,9 @@ def page_live():
                 st.error(f"Narrative generation failed: {exc}")
         elif st.session_state.get("narrative"):
             render_narrative(st.session_state["narrative"])
+
+    st.markdown('<hr>', unsafe_allow_html=True)
+    render_pdf_section(a)
 
 
 def page_markets():
@@ -786,6 +876,9 @@ if "analysis" not in st.session_state:
     if cached:
         st.session_state["analysis"] = cached
 
+if "page" not in st.session_state:
+    st.session_state.page = "Live Analysis"
+
 with st.sidebar:
     st.markdown("""
     <div style="padding:28px 24px 20px;border-bottom:1px solid #141414">
@@ -794,8 +887,17 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
-    page = st.radio("nav", ["⬤  Live Analysis", "◈  Markets", "◎  About", "◻  Methodology"],
-                    label_visibility="collapsed")
+
+    # Session-state button navigation (robust vs custom CSS, unlike st.radio).
+    _pages = ["Live Analysis", "Markets", "About", "Methodology"]
+    _icons = ["⬤", "◈", "◎", "◻"]
+    for _icon, _p in zip(_icons, _pages):
+        _active = st.session_state.page == _p
+        if st.button(f"{_icon}  {_p.upper()}", key=f"nav_{_p}", use_container_width=True,
+                     type="primary" if _active else "secondary"):
+            st.session_state.page = _p
+            st.rerun()
+
     st.markdown("""
     <div style="padding:16px 24px;border-top:1px solid #141414;margin-top:24px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -812,11 +914,11 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-if "Live Analysis" in page:
+if st.session_state.page == "Live Analysis":
     page_live()
-elif "Markets" in page:
+elif st.session_state.page == "Markets":
     page_markets()
-elif "About" in page:
+elif st.session_state.page == "About":
     page_about()
-elif "Methodology" in page:
+elif st.session_state.page == "Methodology":
     page_methodology()
