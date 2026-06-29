@@ -472,8 +472,8 @@ def wc_market_card(name, prob, volume, url, platform):
 
 def pull_quote(text):
     st.markdown(f"""
-    <div style="padding:48px;border:1px solid #141414;margin:32px 0;text-align:center">
-        <div style="font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:300;color:{GOLD};line-height:1.7;font-style:italic;max-width:640px;margin:0 auto">"{text}"</div>
+    <div style="border-left:2px solid {GOLD};padding:18px 0 18px 28px;margin:28px 0">
+        <div style="font-family:'DM Mono',monospace;font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:300;color:{GOLD};line-height:1.5;font-style:italic">"{text}"</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -793,7 +793,7 @@ def page_about():
     page_header("The Story", "Why We Built This")
     pull_quote("Prediction markets look liquid until you actually try to trade size.")
     st.markdown(
-        '<div style="font-size:14px;line-height:1.85;color:#999;max-width:760px;font-weight:300;'
+        '<div style="font-size:14px;line-height:1.85;color:#999;max-width:880px;font-weight:300;'
         'font-family:Inter,sans-serif">During the 2026 FIFA World Cup, a group chat between friends — '
         'Harsha, Aadish, Sohan, and Nitin — kept asking the same question: why did every prediction '
         'market parlay feel like it was bleeding money before the match even resolved? The obvious answer '
@@ -833,7 +833,7 @@ def page_about():
     st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
     section_label("Acknowledgments")
     st.markdown(
-        '<div style="font-size:13px;line-height:1.85;color:#999;max-width:760px;font-weight:300;'
+        '<div style="font-size:13px;line-height:1.85;color:#999;max-width:880px;font-weight:300;'
         'font-family:Inter,sans-serif">Thanks to <span style="color:#e8e8e8">Aadish Sanghvi</span>, '
         '<span style="color:#e8e8e8">Sohan Kumar Rustumpet</span>, and '
         '<span style="color:#e8e8e8">Nitin Kumar Rustumpet</span> — the friends in the group chat '
@@ -888,7 +888,7 @@ def page_methodology():
         "39(4), 1127–1139. — prior art for inferring effective transaction cost.",
     ]:
         st.markdown(f'<div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:10px;'
-                    f'font-family:Inter,sans-serif;font-weight:300;max-width:760px">{cite}</div>',
+                    f'font-family:Inter,sans-serif;font-weight:300;max-width:880px">{cite}</div>',
                     unsafe_allow_html=True)
 
 
