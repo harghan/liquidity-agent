@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/api/:match*",
-      "destination": "/api/index.py?__route=:match*"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py?__route=$1"
     },
     {
       "source": "/assets/(.*)",

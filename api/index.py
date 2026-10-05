@@ -89,6 +89,9 @@ class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self._send_json({"status": "ok"})
 
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_GET(self):
         parsed = urlparse(self.path)
         query = parse_qs(parsed.query)
