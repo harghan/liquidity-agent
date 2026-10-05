@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "harsha-portfolio",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH='/Users/harshaghandikota/.nvm/versions/node/v24.19.0/bin':$PATH && cd '/Users/harshaghandikota/harsha-portfolio' && npm run dev"],
+      "port": 3000
+    }
+  ]
+}

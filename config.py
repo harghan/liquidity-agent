@@ -14,19 +14,12 @@ import logging
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+    load_dotenv(ROOT_DIR / ".env")
+except ImportError:
+    pass
 
-# ---------------------------------------------------------------------------
-# Paths & environment
-# ---------------------------------------------------------------------------
-ROOT_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = ROOT_DIR / "outputs"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-LOG_DIR = ROOT_DIR / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-LOG_FILE = LOG_DIR / "liquidity_agent.log"
-
-load_dotenv(ROOT_DIR / ".env")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 
 # ---------------------------------------------------------------------------
@@ -209,9 +202,9 @@ COLOR_SAFE = "#2d6a4f"
 FONT_BODY = "Helvetica"
 FONT_BOLD = "Helvetica-Bold"
 
-AUTHOR_CREDIT_LINE_1 = ("Research concept and design: Harsha Ghandikota, "
-                        "Duke University, Master of Engineering Management student")
-AUTHOR_CREDIT_LINE_2 = "Autonomous analysis and report generation: Claude Sonnet (Anthropic)"
+AUTHOR_CREDIT_LINE_1 = "Harsha Ghandikota · Duke University, Master of Engineering Management candidate"
+AUTHOR_CREDIT_LINE_2 = "Quantitative research, system design & engineering — conceived and built end to end"
+AUTHOR_CREDIT_LINE_3 = "Autonomous analysis and report generation: Claude Sonnet (Anthropic)"
 DATA_SOURCE = "Polymarket (Gamma + CLOB) & Kalshi (trade-api v2)"
 REPORT_DISCLAIMER = ("This memo is generated autonomously by the Liquidity Agent. "
                      "It does not constitute investment advice.")

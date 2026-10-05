@@ -72,6 +72,51 @@ class OrderBook:
     def is_two_sided(self) -> bool:
         return bool(self.bids) and bool(self.asks)
 
+    # -- microstructure analytics (HFT Tier-1) ------------------------------
+    def microprice(self) -> Optional[float]:
+        """Volume-weighted top-of-book price (adverse selection predictor):
+        (P_bid * Q_ask + P_ask * Q_bid) / (Q_bid + Q_ask)
+        """
+        if not self.is_two_sided():
+            return None
+        bb, ba = self.bids[0], self.asks[0]
+        total_size = bb.size + ba.size
+        if total_size <= 0:
+            return None
+        return (bb.price * ba.size + ba.price * bb.size) / total_size
+
+    def order_book_imbalance(self) -> Optional[float]:
+        """Order Book Imbalance (OBI) at top-of-book: (Q_bid - Q_ask) / (Q_bid + Q_ask).
+        Range: [-1.0, 1.0]. Positive => net buying pressure.
+        """
+        if not self.is_two_sided():
+            return None
+        bb, ba = self.bids[0], self.asks[0]
+        total_size = bb.size + ba.size
+        if total_size <= 0:
+            return 0.0
+        return (bb.size - ba.size) / total_size
+
+    def synthetic_no_book(self) -> "OrderBook":
+        """Generate the economically equivalent OrderBook for the NO outcome.
+        In binary markets:
+        - A YES bid at price P is a NO ask at price (1 - P).
+        - A YES ask at price P is a NO bid at price (1 - P).
+        """
+        synth_bids = [
+            OrderLevel(price=round(1.0 - lvl.price, 5), size=lvl.size)
+            for lvl in self.asks
+            if 0.0 < (1.0 - lvl.price) < 1.0
+        ]
+        synth_asks = [
+            OrderLevel(price=round(1.0 - lvl.price, 5), size=lvl.size)
+            for lvl in self.bids
+            if 0.0 < (1.0 - lvl.price) < 1.0
+        ]
+        synth_bids.sort(key=lambda lvl: lvl.price, reverse=True)
+        synth_asks.sort(key=lambda lvl: lvl.price)
+        return OrderBook(bids=synth_bids, asks=synth_asks)
+
 
 @dataclass
 class NormalizedMarket:
@@ -130,3 +175,33 @@ def _clean_levels(raw: Sequence[Tuple[float, float]]) -> List[OrderLevel]:
             continue
         levels.append(OrderLevel(price=price, size=size))
     return levels
+
+
+def calculate_venue_fee(platform: str, price: float, contracts: float, is_taker: bool = True) -> float:
+    """Calculate the estimated venue execution fee (USD) for a given contract quantity and price.
+    
+    - Kalshi: CFTC-registered variable taker fee based on variance p*(1-p).
+      Formula approximation: 3.5% * p * (1-p) * contracts, capped at 7c/contract.
+    - Polymarket: 0% protocol taker fee on standard CLOB pairs, plus amortized relayer/gas overhead (~$0.02).
+    """
+    if not is_taker or contracts <= 0 or not (0.0 < price < 1.0):
+        return 0.0
+
+    p_norm = platform.lower()
+    if "kalshi" in p_norm:
+        # Kalshi CFTC formula: fee scales with variance, max at 50c
+        variance_factor = 4.0 * price * (1.0 - price)  # 1.0 at p=0.5, 0.0 at p=0,1
+        fee_per_contract = min(0.07, max(0.002, 0.035 * variance_factor))
+        return round(contracts * fee_per_contract, 4)
+    elif "polymarket" in p_norm:
+        # Polymarket 0% fee with minor relayer/gas amortization
+        return 0.02
+    return 0.0
+
+
+def calculate_net_marginal_price(platform: str, price: float, size: float, is_taker: bool = True) -> float:
+    """Compute the effective all-in marginal price per share including exchange fees."""
+    if size <= 0:
+        return price
+    fee = calculate_venue_fee(platform, price, size, is_taker=is_taker)
+    return price + (fee / size)

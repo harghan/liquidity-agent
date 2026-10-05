@@ -26,7 +26,19 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple
 
-from rapidfuzz import fuzz
+try:
+    from rapidfuzz import fuzz
+except ImportError:
+    import difflib
+
+    class _FuzzFallback:
+        @staticmethod
+        def token_set_ratio(s1: str, s2: str) -> float:
+            t1 = " ".join(sorted(set(s1.split())))
+            t2 = " ".join(sorted(set(s2.split())))
+            return difflib.SequenceMatcher(None, t1, t2).ratio() * 100.0
+
+    fuzz = _FuzzFallback()
 
 import config
 from core.normalizer import NormalizedMarket
@@ -113,6 +125,14 @@ def _thresholds(text: str) -> Set[float]:
     return out
 
 
+_YEAR_RE = re.compile(r"\b(202[0-9]|203[0-9])\b")
+
+
+def _years(text: str) -> Set[int]:
+    """Extract 4-digit years in [2020, 2039] from text."""
+    return {int(m.group(1)) for m in _YEAR_RE.finditer(text)}
+
+
 def _months(text: str) -> Set[str]:
     return {_MONTHS[t] for t in _tokens(text) if t in _MONTHS}
 
@@ -132,17 +152,28 @@ def _numeric_conflict(a: Set[float], b: Set[float]) -> bool:
 
 def semantic_conflict(a: NormalizedMarket, b: NormalizedMarket) -> Optional[str]:
     """Return a rejection reason if two same-category markets are not equivalent
-    events (opposite direction, disjoint thresholds, or different meeting/date),
+    events (opposite direction, disjoint thresholds, different years, or different months),
     else None."""
+    # 1. Temporal Horizon Check: Disjoint resolution years are strictly fatal
+    ay, by = _years(a.question), _years(b.question)
+    if ay and by and not (ay & by):
+        return "year_horizon_mismatch"
+
+    # 2. Directional Check: Opposing bets (hike vs cut, over vs under)
     at, bt = set(_tokens(a.question)), set(_tokens(b.question))
     ad, bd = _directions(at), _directions(bt)
     if ad and bd and not (ad & bd):
         return "directional_conflict"
+
+    # 3. Numeric Threshold Check: Disjoint strikes/targets
     if _numeric_conflict(_thresholds(a.question), _thresholds(b.question)):
         return "numeric_threshold_mismatch"
+
+    # 4. Month Horizon Check: Disjoint months within same year
     am, bm = _months(a.question), _months(b.question)
     if am and bm and not (am & bm):
         return "date_horizon_mismatch"
+
     return None
 
 

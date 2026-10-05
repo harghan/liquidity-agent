@@ -156,6 +156,15 @@ def _g(d, *path, default=None):
     return cur
 
 
+def kalshi_market_url(ticker):
+    """Kalshi web URL. Ticker-path deep links don't resolve on kalshi.com; the
+    lowercased series page (ticker up to the first dash) reliably does."""
+    if not ticker:
+        return "https://kalshi.com/markets"
+    series = ticker.split("-")[0].lower()
+    return f"https://kalshi.com/markets/{series}"
+
+
 def load_cached_analysis():
     p = config.OUTPUT_DIR / "analysis.json"
     if p.exists():
@@ -249,7 +258,7 @@ def fetch_wc_kalshi(limit=12):
                 prob = 0
             tk = m.get("event_ticker") or m.get("ticker") or ""
             out.append({"name": name, "prob": prob, "volume": 0,
-                        "url": f"https://kalshi.com/markets/{tk}" if tk else "https://kalshi.com/markets"})
+                        "url": kalshi_market_url(tk)})
     return out[:limit]
 
 
@@ -401,7 +410,7 @@ def market_card(pair):
     divergence = pair.get("divergence_bps", 0)
 
     pm_url = f"https://polymarket.com/event/{pair.get('polymarket_slug', '')}" if pair.get("polymarket_slug") else "https://polymarket.com"
-    kx_url = f"https://kalshi.com/markets/{pair.get('kalshi_ticker', '')}" if pair.get("kalshi_ticker") else "https://kalshi.com/markets"
+    kx_url = kalshi_market_url(pair.get("kalshi_ticker", ""))
 
     cat_colors = {"PRES": ("#0d0d20", "#60a5fa"), "FED": ("#0d2018", "#4ade80"), "REC": ("#200d0d", "#f87171")}
     cat_bg, cat_fg = cat_colors.get(cat, ("#161205", GOLD))

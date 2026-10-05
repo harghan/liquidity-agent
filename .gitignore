@@ -17,3 +17,4 @@ outputs/*.json
 # OS
 .DS_Store
 .claude/settings.local.json
+.vercel

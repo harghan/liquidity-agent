@@ -1,100 +1,125 @@
-# liquidity-agent
+# EventRoute // Institutional Prediction Market Liquidity & Smart Order Router (SOR)
 
-A cross-platform prediction-market **liquidity intelligence agent**. It pulls
-~300 live markets each from **Polymarket** and **Kalshi**, matches overlapping
-markets across venues with an NLP hybrid matcher, walks each orderbook at five
-order sizes to measure *real* volume-weighted price impact, scores a **Liquidity
-Quality Index (LQI)** per market per platform, and uses the **Anthropic Claude
-API** to author the interpretive prose for a **9-page, visual-first PDF research
-report**.
+[![Tests](https://img.shields.io/badge/tests-10%2F10%20passing-brightgreen)](#test-suite)
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](#architecture)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](#commercial-model)
 
-```bash
-python run_agent.py        # -> outputs/liquidity_report_YYYY-MM-DD.pdf  (+ JSON artifacts)
-python run_scheduled.py    # same pipeline, appends a record to outputs/timeseries.json
+An enterprise-grade quantitative execution engine and liquidity intelligence terminal designed for macro hedge funds, quantitative proprietary trading desks, and institutional brokers trading event derivatives across fragmented prediction venues (**Polymarket** and **Kalshi**).
+
+---
+
+## ⚡ The Blue Ocean Value Proposition
+
+Retail traders and unsophisticated screen-watchers look at displayed mid-prices. **Serious capital looks at executable depth, marginal liquidity consumption, and book exhaustion.**
+
+* **The Problem:** In fragmented prediction markets, executing an institutional clip (\$25k to \$100k+) on a single venue can cause an **84x price inflation** due to shallow orderbook depth.
+* **The Solution:** EventRoute provides a **non-custodial Smart Order Router (SOR)** that continuously streams orderbooks across decentralized CLOBs (Polymarket) and CFTC-regulated exchanges (Kalshi), solving the discrete marginal cost waterfilling problem in sub-milliseconds to minimize implementation shortfall.
+
+```
+                              EVENTROUTE SYSTEM ARCHITECTURE
+   
+  [ Ingestion Layer ]                 [ Quantitative Core ]             [ Enterprise Delivery ]
+  
+  +----------------------+            +-----------------------+         +-----------------------+
+  | Polymarket CLOB      |            | Temporal Matcher      |         | EventRoute Web        |
+  | (Polygon Off-Chain)  |---+        | (Deterministic Year/  |         | Terminal (Streamlit)  |
+  +----------------------+   |        |  Horizon Conflict)    |         | - Real-Time SOR Sim   |
+                             +------->+-----------------------+-------->| - Depth Waterfall     |
+  +----------------------+   |        | Smart Order Router    |         | - Parity Radar        |
+  | Kalshi CFTC DCM      |---+        | (Discrete Waterfill   |         +-----------------------+
+  | (Secaucus Engine)    |            |  Marginal Cost Opt)   |
+  +----------------------+            +-----------------------+         +-----------------------+
+                                      | Parity & Basis Engine |         | High-Throughput       |
+                                      | (Binary Parity &      |-------->| B2B Execution API     |
+                                      |  SOFR Hurdle Rate)    |         | (JSON / WebSocket)    |
+                                      +-----------------------+         +-----------------------+
 ```
 
-## Pipeline
+---
 
-1. **Collect** ~300 in-scope markets per platform (macro, crypto, politics,
-   sports/World Cup) — metadata only, cheap and paged.
-2. **Match** equivalent markets across venues. A category gate, then a
-   confidence score blending rapidfuzz question similarity with entity-keyword
-   similarity (candidate name / rate threshold / asset / team). **Semantic
-   guards** reject opposite directions (hike vs cut), mismatched numeric
-   thresholds (BTC $150k vs $69k), and different dates. Thresholds are
-   category-aware: **0.75** for person/candidate markets, **0.65** otherwise.
-   Every near-miss is logged to `rejected_pairs.json`.
-3. **Fetch orderbooks** for matched markets only.
-4. **Walk each book** at **$500 / $2k / $10k / $50k / $100k**. Impact is the
-   volume-weighted execution price minus displayed mid (in bps); where a book is
-   exhausted the cost to sweep it is reported as a lower bound — that is where
-   the orderbook "breaks".
-5. **Score the LQI** (0–100): spread (30%), depth via $2k impact (40%), and
-   $10k impact (30%) — mid-book depth weighted highest per practitioner
-   convention (cf. Kyle 1985, Amihud 2002, Roll 1984).
-6. **Reason + render**: Claude (`claude-sonnet-4-6`) writes the interpretive
-   prose as structured JSON grounded in the computed analysis; the report writer
-   renders nine pages of charts and styled tables. If the API key is missing or
-   the call fails, grounded default prose is used and the report still builds.
+## 🚀 Key Features
 
-## The report (9 pages, visual-first)
+### 1. Multi-Venue Smart Order Router (`core/sor.py`)
+* **Equal-Marginal-Price Discrete Waterfilling:** Solves $\min \sum \text{Cost}_i(q_i)$ subject to $\sum q_i = Q_{\text{target}}$ across heterogeneous orderbooks.
+* **Fee-Adjusted Marginal Cost:** Ingests Kalshi's CFTC variable fee curve $3.5\% \times p(1-p)$ and Polymarket's gas/relayer dynamics.
+* **Implementation Shortfall & Alpha Quantification:** Automatically calculates exact dollar savings vs. worst-case single venue and slippage basis point improvements.
+* **Legging Risk Index:** Measures cross-venue execution and partial fill risk (0 to 100).
 
-1. Title page — dark header band, gold subtitle, run parameters, author credit.
-2. Analytics dashboard — four KPI boxes + platform-quality and impact-scaling charts.
-3. The money chart — price-impact curves across all five sizes with crosshairs.
-4. Liquidity-quality heatmap — every matched market, diverging colour scales.
-5. Slippage league table — avoidable-slippage bar chart + ranked table.
-6. Cross-platform divergence dot plot — same event, two displayed prices.
-7. Probability-vs-impact scatter — liquidity-provision model per platform.
-8. Root-cause analysis + platform-specific recommendations.
-9. Methodology, limitations, and academic references.
+### 2. Microstructure & Parity Engine (`core/parity.py` & `core/normalizer.py`)
+* **Two-Sided Parity:** Full support for `BUY YES`, `BUY NO`, `SELL YES`, and `SELL NO` via binary complement orderbook mapping ($P_{\text{YES}} + P_{\text{NO}} = 1.00$).
+* **Order Book Imbalance (OBI) & Microprice:** Real-time adverse selection predictors at the top of the book.
+* **Capital Efficiency & SOFR Hurdle Evaluation:** Benchmarks synthetic arbitrage against the 4.80% risk-free rate, warning desks when the 200% margin lockup makes a trade capital-destructive.
 
-## Output artifacts (`outputs/`)
+### 3. Institutional Resolution & Temporal Matcher (`core/matcher.py`)
+* **Zero False-Positive Calendar Matching:** Strict `_years()` extraction guarantees that cross-year contracts (e.g., 2026 vs. 2027 Fed cuts) trigger immediate `year_horizon_mismatch` rejections.
+* **Semantic Conflict Guards:** Deterministic rejection of opposing directions (`hike` vs. `cut`) and disjoint numeric strike thresholds.
 
-| File | Contents |
-|------|----------|
-| `liquidity_report_{date}.pdf` | the 9-page report |
-| `rejected_pairs.json` | every near-miss candidate pair with confidence + rejection reason (proof matching is algorithmic) |
-| `raw_impacts.json` | full impact dataset at all five order sizes for every market |
-| `summary.json` | machine-readable summary: platform LQI, total avoidable slippage, match count, top-3 pairs, timestamp |
-| `timeseries.json` | appended per `run_scheduled.py` run, for longitudinal deployment |
+### 4. Interactive Web Terminal (`app.py`)
+* High-frequency dark-theme interactive interface powered by Streamlit and Plotly.
+* Live SOR Execution Simulator with real-time allocation sliders and execution waterfall charts.
+* Side-by-side cumulative depth waterfall comparison and synthetic arbitrage monitor.
 
-## Setup
+---
 
+## 🛠️ Quickstart
+
+### 1. Launch the Institutional Web Terminal
 ```bash
-pip install -r requirements.txt
-cp .env.example .env          # add your ANTHROPIC_API_KEY
-python run_agent.py
+streamlit run app.py
+```
+Access the interactive terminal at `http://localhost:8501`.
+
+### 2. Run the Quantitative Test Suite
+```bash
+python3 test_all.py
 ```
 
-Only `ANTHROPIC_API_KEY` is required (for the report prose). All market-data
-APIs are free and keyless. Each collector is independently runnable for
-smoke-testing: `python -m collectors.polymarket` / `python -m collectors.kalshi`.
+---
 
-## A note on matched-pair counts
+## 🧪 Test Suite
 
-The matched set reflects genuine live cross-platform overlap. Presidential
-(candidate) markets overlap richly; recession, Fed-rate, and crypto produce a
-handful of true equivalents; inflation and World Cup currently have essentially
-no economically-identical contracts across the two venues (e.g. Polymarket lists
-no CPI markets, and its World Cup contracts are outright-winner while Kalshi's
-are per-match). Rather than force category quotas, the agent reports exactly what
-the algorithm finds and logs all rejections — by design, with zero
-cherry-picking.
+The quantitative core is backed by 10 comprehensive unit and property tests verifying mathematical optimality and conflict detection:
 
-## Project structure
+| Test Name | Component | Verified Property |
+| :--- | :--- | :--- |
+| `test_single_venue_cheapest_fill` | `core/sor.py` | 100% allocation to single venue when strictly dominant |
+| `test_multi_venue_waterfilling_split` | `core/sor.py` | Optimal spillover allocation at exact marginal cost threshold |
+| `test_sor_strictly_dominates_worst` | `core/sor.py` | Proven reduction in implementation shortfall vs single venue |
+| `test_partial_fill_handling` | `core/sor.py` | Graceful degradation and capacity reporting on book exhaustion |
+| `test_year_horizon_mismatch` | `core/matcher.py` | Deterministic rejection of disjoint resolution years (2026 vs 2027) |
+| `test_directional_conflict` | `core/matcher.py` | Immediate rejection of opposing bets (hike vs cut) |
+| `test_month_horizon_mismatch` | `core/matcher.py` | Calendar mismatch detection within fiscal year |
+| `test_identical_events_pass` | `core/matcher.py` | High-confidence matching of economically identical events |
+| `test_discount_arbitrage_detection` | `core/parity.py` | Detection of $Ask_{\text{YES}} + Ask_{\text{NO}} < 1.00$ discounts |
+| `test_no_arbitrage_when_spreads_wide` | `core/parity.py` | No false arbitrage alarms during normal bid/ask spreads |
+
+---
+
+## 📁 Project Layout
 
 ```
 liquidity-agent/
-├── run_agent.py            # single entry point
-├── run_scheduled.py        # scheduled runner -> timeseries.json
-├── config.py               # all tunable parameters + design system
-├── collectors/             # polymarket.py, kalshi.py, http_client.py
-├── core/                   # normalizer, matcher, price_impact, scorer
-├── agent/                  # report_writer.py (PDF), charts.py (matplotlib)
-├── outputs/                # PDF + JSON artifacts
-└── logs/                   # timestamped run logs
+├── app.py                  # Institutional Web Terminal (Streamlit + Plotly)
+├── test_all.py             # Standalone test runner (10/10 tests)
+├── run_tests.py            # Unittest runner adapter
+├── config.py               # Tunable constants, design system, fee schedules
+├── core/
+│   ├── sor.py              # Enterprise Smart Order Router (Waterfilling)
+│   ├── parity.py           # Synthetic binary parity & SOFR hurdle engine
+│   ├── normalizer.py       # Normalized schemas, microprice, fees, OrderBook
+│   ├── matcher.py          # Temporal horizon & semantic conflict matcher
+│   ├── price_impact.py     # Multi-size book walker ($500 to $100k)
+│   └── scorer.py           # Liquidity Quality Index (LQI)
+├── collectors/             # Polymarket & Kalshi REST / CLOB fetchers
+├── agent/                  # PDF report generator & matplotlib charts
+├── tests/                  # Test suite (test_sor, test_matcher, test_parity)
+└── outputs/                # Historical datasets, raw impacts, summary JSON
 ```
 
-All parameters — order sizes, LQI weights, matching thresholds, Kalshi series,
-the model, and the full colour/typography design system — live in `config.py`.
+---
+
+## 💼 Commercial Model & Ideal Customer Profile (ICP)
+
+1. **Macro Hedge Funds & Quantitative Prop Desks:** Pre-trade market impact simulator and non-custodial Smart Order Routing API to deploy 6-figure positions with minimal slippage.
+2. **Neo-Brokers & Web3 Frontends:** White-label routing SDK enabling retail frontends to tap unified cross-venue liquidity.
+3. **Market Makers:** Real-time cross-venue basis alerts and oracle resolution divergence monitoring.

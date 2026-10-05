@@ -473,11 +473,14 @@ def _on_cover(canvas, doc):
     canvas.setFillColor(HexColor("#cfcfcf"))
     canvas.setFont(config.FONT_BODY, 8)
     canvas.drawCentredString(PAGE_W / 2, y - 22, "QUANTITATIVE STRATEGY  |  MARKET MICROSTRUCTURE RESEARCH")
-    # Author credit — bottom quarter, centered 9pt.
-    canvas.setFillColor(HexColor("#1a1a1a"))
-    canvas.setFont(config.FONT_BODY, 9)
-    canvas.drawCentredString(PAGE_W / 2, 1.30 * inch, config.AUTHOR_CREDIT_LINE_1)
-    canvas.drawCentredString(PAGE_W / 2, 1.30 * inch - 14, config.AUTHOR_CREDIT_LINE_2)
+    # Author credit — bottom quarter, centered.
+    canvas.setFillColor(HexColor("#0a0a0a"))
+    canvas.setFont(config.FONT_BOLD, 9)
+    canvas.drawCentredString(PAGE_W / 2, 1.42 * inch, config.AUTHOR_CREDIT_LINE_1)
+    canvas.setFont(config.FONT_BODY, 8.5)
+    canvas.setFillColor(HexColor("#444444"))
+    canvas.drawCentredString(PAGE_W / 2, 1.42 * inch - 14, config.AUTHOR_CREDIT_LINE_2)
+    canvas.drawCentredString(PAGE_W / 2, 1.42 * inch - 28, config.AUTHOR_CREDIT_LINE_3)
     _draw_footer(canvas)
     canvas.restoreState()
 
