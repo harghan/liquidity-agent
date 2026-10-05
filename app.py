@@ -1,5 +1,5 @@
 """
-EventRoute // Institutional Prediction Market Liquidity & Smart Order Routing Terminal.
+PRISM // Institutional Prediction Market Liquidity & Smart Order Routing Terminal.
 
 A high-performance quantitative interface for macro funds, prop trading desks,
 and market makers executing size across fragmented prediction venues.
@@ -24,8 +24,8 @@ from core.sor import SmartOrderRouter, SORResult
 # Configuration & Theme
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="EventRoute // Institutional Liquidity Terminal",
-    page_icon="⚡",
+    page_title="PRISM // Institutional Liquidity Terminal",
+    page_icon="◈",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -171,7 +171,7 @@ def generate_live_simulated_pair(name: str, mid_poly: float, mid_kalshi: float):
 # -----------------------------------------------------------------------------
 raw_impacts, summary = load_market_data()
 
-st.sidebar.markdown("### ⚡ EventRoute")
+st.sidebar.markdown("### ◈ PRISM")
 st.sidebar.caption("Institutional Smart Order Router & TCA Terminal")
 st.sidebar.markdown("---")
 
@@ -195,7 +195,7 @@ st.sidebar.caption("Latency Engine: Sub-millisecond Discrete Waterfilling")
 # Top Header Banner
 col_h1, col_h2 = st.columns([3, 1])
 with col_h1:
-    st.title("EventRoute // Execution Intelligence")
+    st.title("PRISM // Execution Intelligence")
     st.caption("Low-Latency Liquidity Aggregation & Pre-Trade TCA for Event Derivatives")
 
 # Top KPI Metric Strip
@@ -546,7 +546,7 @@ elif nav_choice == "⚖️ Synthetic Parity & Arbitrage":
     st.warning(
         "⚠️ **The 200% Margin Reality:** In event markets without cross-margining, capital is locked until resolution. "
         "An apparent 185 bps spread over 140 days yields only 4.0% annualized, underperforming 3-month US Treasury Bills (4.80%). "
-        "EventRoute flags capital-destructive trades to protect fund balance sheets."
+        "PRISM flags capital-destructive trades to protect fund balance sheets."
     )
 
 

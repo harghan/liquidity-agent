@@ -1,10 +1,10 @@
-# EventRoute // Institutional Prediction Market Liquidity & Smart Order Router (SOR)
+# PRISM // Institutional Prediction Market Liquidity & Smart Order Router (SOR)
 
-[![Tests](https://img.shields.io/badge/tests-10%2F10%20passing-brightgreen)](#test-suite)
+[![Tests](https://img.shields.io/badge/tests-14%2F14%20passing-brightgreen)](#test-suite)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](#architecture)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](#commercial-model)
 
-An enterprise-grade quantitative execution engine and liquidity intelligence terminal designed for macro hedge funds, quantitative proprietary trading desks, and institutional brokers trading event derivatives across fragmented prediction venues (**Polymarket** and **Kalshi**).
+An enterprise-grade quantitative execution engine, autonomous AI order refraction agent, and liquidity intelligence terminal designed for macro hedge funds, quantitative proprietary trading desks, and institutional brokers trading event derivatives across fragmented prediction venues (**Polymarket** and **Kalshi**).
 
 ---
 
@@ -13,25 +13,25 @@ An enterprise-grade quantitative execution engine and liquidity intelligence ter
 Retail traders and unsophisticated screen-watchers look at displayed mid-prices. **Serious capital looks at executable depth, marginal liquidity consumption, and book exhaustion.**
 
 * **The Problem:** In fragmented prediction markets, executing an institutional clip (\$25k to \$100k+) on a single venue can cause an **84x price inflation** due to shallow orderbook depth.
-* **The Solution:** EventRoute provides a **non-custodial Smart Order Router (SOR)** that continuously streams orderbooks across decentralized CLOBs (Polymarket) and CFTC-regulated exchanges (Kalshi), solving the discrete marginal cost waterfilling problem in sub-milliseconds to minimize implementation shortfall.
+* **The Solution:** PRISM provides a **non-custodial Smart Order Router (SOR)** and **Autonomous AI Execution Agent** that continuously streams orderbooks across decentralized CLOBs (Polymarket) and CFTC-regulated exchanges (Kalshi), solving the discrete marginal cost waterfilling problem in sub-milliseconds to minimize implementation shortfall.
 
 ```
-                              EVENTROUTE SYSTEM ARCHITECTURE
+                                 PRISM SYSTEM ARCHITECTURE
    
-  [ Ingestion Layer ]                 [ Quantitative Core ]             [ Enterprise Delivery ]
+  [ Ingestion Layer ]                 [ Quantitative & AI Core ]        [ Enterprise Delivery ]
   
   +----------------------+            +-----------------------+         +-----------------------+
-  | Polymarket CLOB      |            | Temporal Matcher      |         | EventRoute Web        |
-  | (Polygon Off-Chain)  |---+        | (Deterministic Year/  |         | Terminal (Streamlit)  |
-  +----------------------+   |        |  Horizon Conflict)    |         | - Real-Time SOR Sim   |
-                             +------->+-----------------------+-------->| - Depth Waterfall     |
-  +----------------------+   |        | Smart Order Router    |         | - Parity Radar        |
-  | Kalshi CFTC DCM      |---+        | (Discrete Waterfill   |         +-----------------------+
-  | (Secaucus Engine)    |            |  Marginal Cost Opt)   |
+  | Polymarket CLOB      |            | Autonomous AI Agent   |         | PRISM Web Terminal    |
+  | (Polygon Off-Chain)  |---+        | (NLP Intent Parser &  |         | (Vercel Production &  |
+  +----------------------+   |        |  Microstructure Pred) |         |  Apple Pro UI)        |
+                             +------->+-----------------------+-------->| - Real-Time SOR Sim   |
+  +----------------------+   |        | Smart Order Router    |         | - Spotlight ⌘K Bar    |
+  | Kalshi CFTC DCM      |---+        | (Discrete Waterfill   |         | - Depth Waterfall     |
+  | (Secaucus Engine)    |            |  Marginal Cost Opt)   |         | - Parity Radar        |
   +----------------------+            +-----------------------+         +-----------------------+
                                       | Parity & Basis Engine |         | High-Throughput       |
                                       | (Binary Parity &      |-------->| B2B Execution API     |
-                                      |  SOFR Hurdle Rate)    |         | (JSON / WebSocket)    |
+                                      |  SOFR Hurdle Rate)    |         | (JSON / Serverless)   |
                                       +-----------------------+         +-----------------------+
 ```
 
@@ -78,7 +78,7 @@ python3 test_all.py
 
 ## 🧪 Test Suite
 
-The quantitative core is backed by 10 comprehensive unit and property tests verifying mathematical optimality and conflict detection:
+The quantitative core is backed by 14 comprehensive unit, microstructure, and AI agent property tests verifying mathematical optimality and autonomous execution:
 
 | Test Name | Component | Verified Property |
 | :--- | :--- | :--- |
@@ -92,6 +92,10 @@ The quantitative core is backed by 10 comprehensive unit and property tests veri
 | `test_identical_events_pass` | `core/matcher.py` | High-confidence matching of economically identical events |
 | `test_discount_arbitrage_detection` | `core/parity.py` | Detection of $Ask_{\text{YES}} + Ask_{\text{NO}} < 1.00$ discounts |
 | `test_no_arbitrage_when_spreads_wide` | `core/parity.py` | No false arbitrage alarms during normal bid/ask spreads |
+| `test_intent_parsing` | `core/ai_agent.py` | Natural language parameter extraction (size, side, slippage, urgency) |
+| `test_short_intent_parsing` | `core/ai_agent.py` | Directional classification for synthetic shorts and hedges |
+| `test_microstructure_predictor_cadence`| `core/ai_agent.py` | OBI, microprice drift, and iceberg vs sweep queue classification |
+| `test_autonomous_sor_planning` | `core/ai_agent.py` | End-to-end plan generation, PM rationale, and cryptographic ticket |
 
 ---
 
@@ -99,20 +103,22 @@ The quantitative core is backed by 10 comprehensive unit and property tests veri
 
 ```
 liquidity-agent/
-├── app.py                  # Institutional Web Terminal (Streamlit + Plotly)
-├── test_all.py             # Standalone test runner (10/10 tests)
-├── run_tests.py            # Unittest runner adapter
-├── config.py               # Tunable constants, design system, fee schedules
+├── public/                 # Enterprise Apple Pro Web Terminal (Jony Ive Design System)
+│   └── index.html          # PRISM Web Terminal with Spotlight ⌘K AI Mandate Engine
+├── api/                    # Vercel Serverless Python Backend
+│   └── index.py            # Endpoints: /api/route, /api/markets, /api/parity, /api/ai/plan
 ├── core/
-│   ├── sor.py              # Enterprise Smart Order Router (Waterfilling)
-│   ├── parity.py           # Synthetic binary parity & SOFR hurdle engine
+│   ├── ai_agent.py         # Autonomous Execution Agent & Predictive Microstructure
+│   ├── sor.py              # Enterprise Smart Order Router (Discrete Waterfilling)
+│   ├── parity.py           # Synthetic binary parity & SOFR hurdle rate engine
 │   ├── normalizer.py       # Normalized schemas, microprice, fees, OrderBook
 │   ├── matcher.py          # Temporal horizon & semantic conflict matcher
 │   ├── price_impact.py     # Multi-size book walker ($500 to $100k)
 │   └── scorer.py           # Liquidity Quality Index (LQI)
+├── app.py                  # Streamlit TCA & Macro Execution Terminal
+├── test_all.py             # Standalone test runner (14/14 tests)
 ├── collectors/             # Polymarket & Kalshi REST / CLOB fetchers
-├── agent/                  # PDF report generator & matplotlib charts
-├── tests/                  # Test suite (test_sor, test_matcher, test_parity)
+├── tests/                  # Test suite (test_sor, test_matcher, test_parity, test_ai_agent)
 └── outputs/                # Historical datasets, raw impacts, summary JSON
 ```
 

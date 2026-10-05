@@ -1,6 +1,6 @@
 """
-EventRoute // Vercel Serverless API Endpoint.
-Exposes Smart Order Router (SOR), Market Depths, and Synthetic Parity calculations.
+PRISM // Vercel Serverless API Endpoint.
+Exposes Autonomous AI Smart Order Router (SOR), Microstructure Predictor, and Synthetic Parity.
 """
 
 import json
@@ -14,6 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from core.ai_agent import AutonomousSORAgent, ExecutionIntentParser, MicrostructurePredictor
 from core.normalizer import NormalizedMarket, build_orderbook
 from core.parity import ParityEngine
 from core.sor import SmartOrderRouter
@@ -96,10 +97,14 @@ class handler(BaseHTTPRequestHandler):
         if path.endswith("/api/health") or path == "/api":
             return self._send_json({
                 "status": "healthy",
-                "service": "EventRoute SOR Engine",
-                "version": "2.0.0",
+                "service": "PRISM Liquidity Refraction Engine",
+                "version": "2.1.0",
                 "venues": ["Polymarket", "Kalshi"],
             })
+
+        if path.endswith("/api/ai/plan"):
+            prompt = query.get("prompt", ["Deploy $50k on Vivek Ramaswamy with < 20 bps slippage"])[0]
+            return self._send_json(self._generate_ai_plan(prompt))
 
         if path.endswith("/api/markets"):
             events = [
@@ -181,6 +186,7 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
+        path = parsed.path
         content_len = int(self.headers.get("Content-Length", 0))
         post_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
 
@@ -188,6 +194,10 @@ class handler(BaseHTTPRequestHandler):
             body = json.loads(post_body.decode("utf-8"))
         except Exception:
             body = {}
+
+        if path.endswith("/api/ai/plan"):
+            prompt = body.get("prompt", "Deploy $50k on Vivek Ramaswamy with < 20 bps slippage")
+            return self._send_json(self._generate_ai_plan(prompt))
 
         event_name = body.get("event", "Vivek Ramaswamy 2028")
         size_usd = float(body.get("size_usd", 25000.0))
@@ -198,6 +208,40 @@ class handler(BaseHTTPRequestHandler):
         res = router.route([pm, km], notional_usd=size_usd, side=side)
 
         return self._send_json(self._serialize_sor(res))
+
+    def _generate_ai_plan(self, prompt: str):
+        markets = []
+        for ev in ["Vivek Ramaswamy 2028", "Federal Reserve FOMC July 2026", "Recession 2026"]:
+            pm, km = get_demo_markets(ev)
+            markets.extend([pm, km])
+
+        ai_agent = AutonomousSORAgent()
+        plan = ai_agent.plan_execution(prompt, markets)
+
+        return {
+            "status": "success",
+            "prompt": plan.intent.raw_prompt,
+            "intent": {
+                "target_size_usd": plan.intent.target_size_usd,
+                "side": plan.intent.side,
+                "outcome_target": plan.intent.outcome_target,
+                "max_slippage_bps": plan.intent.max_slippage_bps,
+                "urgency": plan.intent.urgency,
+                "execution_style": plan.intent.execution_style,
+                "keywords": plan.intent.target_event_keywords,
+            },
+            "signals": {
+                "order_book_imbalance": plan.signals.order_book_imbalance,
+                "microprice_drift_bps": plan.signals.microprice_drift_bps,
+                "predicted_impact_bps": plan.signals.predicted_impact_bps,
+                "recommended_cadence": plan.signals.recommended_cadence,
+                "confidence_score": plan.signals.confidence_score,
+            },
+            "matched_event": plan.matched_market.question if plan.matched_market else "Vivek Ramaswamy 2028",
+            "ai_rationale": plan.ai_rationale,
+            "pre_signed_hash": plan.pre_signed_hash,
+            "sor_result": self._serialize_sor(plan.sor_result) if plan.sor_result else None,
+        }
 
     def _serialize_sor(self, res):
         allocs = {}

@@ -14,6 +14,8 @@ import logging
 import os
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent
+
 try:
     from dotenv import load_dotenv
     load_dotenv(ROOT_DIR / ".env")

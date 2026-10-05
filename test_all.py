@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EventRoute // Enterprise Test Verification Suite.
+PRISM // Enterprise Test Verification Suite.
 Run directly to execute all institutional quantitative and microstructure tests:
     python3 test_all.py
 """
@@ -20,7 +20,7 @@ from tests.test_parity import TestParityEngine
 
 def run_all():
     print("=" * 70)
-    print("EVENTROUTE // INSTITUTIONAL QUANTITATIVE TEST SUITE")
+    print("PRISM // INSTITUTIONAL QUANTITATIVE & AI/ML TEST SUITE")
     print("=" * 70)
 
     # 1. Smart Order Router Tests
@@ -49,7 +49,7 @@ def run_all():
     print("  [PASS] Equivalent Economic Events Pass Verification")
 
     # 3. Parity & Synthetic Arbitrage Tests
-    print("\n[3/3] Running Binary Parity & Capital Efficiency Tests...")
+    print("\n[3/4] Running Binary Parity & Capital Efficiency Tests...")
     tp = TestParityEngine()
     tp.setup_method()
     tp.test_discount_arbitrage_detection()
@@ -57,8 +57,21 @@ def run_all():
     tp.test_no_arbitrage_when_spreads_wide()
     print("  [PASS] Normal Market Spread Invariance")
 
+    # 4. Autonomous AI Agent & ML Predictive Model Tests
+    print("\n[4/4] Running Autonomous AI Intent & Predictive Microstructure Tests...")
+    from tests.test_ai_agent import TestAIAgent
+    ta = TestAIAgent()
+    ta.test_intent_parsing()
+    print("  [PASS] Natural Language Intent Parsing & Extraction")
+    ta.test_short_intent_parsing()
+    print("  [PASS] Synthetic Short & Urgency Classification")
+    ta.test_microstructure_predictor_cadence()
+    print("  [PASS] Microstructure OBI & Queue Cadence Prediction")
+    ta.test_autonomous_sor_planning()
+    print("  [PASS] End-to-End Autonomous Execution Plan Generation")
+
     print("\n" + "=" * 70)
-    print(">>> ALL 10 QUANTITATIVE & MICROSTRUCTURE TESTS PASSED WITH 100% SUCCESS! <<<")
+    print(">>> ALL 14 QUANTITATIVE, MICROSTRUCTURE, & AI/ML TESTS PASSED! <<<")
     print("=" * 70)
 
 
