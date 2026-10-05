@@ -1,0 +1,45 @@
+{
+  "name": "liquidity-agent",
+  "version": "1.0.0",
+  "description": "[![Tests](https://img.shields.io/badge/tests-14%2F14%20passing-brightgreen)](#test-suite) [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](#architecture) [![License](https://img.shields.io/badge/license-Proprietary-red)](#commercial-model)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harghan/liquidity-agent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/harghan/liquidity-agent/issues"
+  },
+  "homepage": "https://github.com/harghan/liquidity-agent#readme",
+  "dependencies": {
+    "lucide-react": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  }
+}

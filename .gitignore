@@ -18,3 +18,5 @@ outputs/*.json
 .DS_Store
 .claude/settings.local.json
 .vercel
+node_modules/
+dist/
