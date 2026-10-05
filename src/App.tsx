@@ -11,9 +11,23 @@ import { ApiDocs } from '@/components/ApiDocs';
 import { CommandPaletteModal } from '@/components/CommandPaletteModal';
 import { DispatchModal } from '@/components/DispatchModal';
 import { Footer } from '@/components/Footer';
+import { LoginGate } from '@/components/LoginGate';
 import { MarketEvent, MicrostructureSignals, ExecutionTranche } from '@/types';
 
 export const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return !!localStorage.getItem('prism_auth_token');
+  });
+  const [deskId, setDeskId] = useState<string>(() => {
+    return localStorage.getItem('prism_desk_id') || 'Harsha Ghandikota';
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem('prism_auth_token');
+    localStorage.removeItem('prism_desk_id');
+    setIsAuthenticated(false);
+  };
+
   const [activeTab, setActiveTab] = useState<string>('terminal');
   const [selectedMarketKey, setSelectedMarketKey] = useState<string>('vram');
   const [direction, setDirection] = useState<string>('BUY YES');
@@ -250,12 +264,25 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  if (!isAuthenticated) {
+    return (
+      <LoginGate
+        onLoginSuccess={(desk) => {
+          setIsAuthenticated(true);
+          setDeskId(desk);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#060709] text-slate-100 selection:bg-sky-500/20 selection:text-sky-300">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenCmd={() => setIsCmdOpen(true)}
+        authenticatedDesk={deskId}
+        onLogout={handleLogout}
       />
 
       <main className="max-w-6xl mx-auto px-6 md:px-8 py-10 w-full">

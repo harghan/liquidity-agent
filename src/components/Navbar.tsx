@@ -1,13 +1,21 @@
 import React from 'react';
-import { Layers, Activity, Terminal, ShieldCheck, BarChart3, Code2, Command } from 'lucide-react';
+import { Layers, Activity, Terminal, ShieldCheck, BarChart3, Code2, Command, LogOut } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenCmd: () => void;
+  authenticatedDesk?: string | null;
+  onLogout?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenCmd }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  activeTab,
+  setActiveTab,
+  onOpenCmd,
+  authenticatedDesk,
+  onLogout,
+}) => {
   const tabs = [
     { id: 'terminal', label: 'Terminal (SOR)', icon: Terminal },
     { id: 'parity', label: 'Parity Radar', icon: ShieldCheck },
@@ -54,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenC
         })}
       </nav>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-mono">
           <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400 animate-pulse" />
           <span>0.34ms Waterfill</span>
@@ -70,6 +78,26 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenC
             ⌘K
           </kbd>
         </button>
+
+        {authenticatedDesk && (
+          <div className="flex items-center gap-2 pl-3 border-l border-white/[0.1]">
+            <div className="hidden md:flex flex-col text-right">
+              <span className="text-[11px] font-semibold text-white leading-tight max-w-[140px] truncate">
+                {authenticatedDesk}
+              </span>
+              <span className="text-[9px] font-mono text-emerald-400">Desk Cleared</span>
+            </div>
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                title="Lock Desk / Sign Out"
+                className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/[0.08] hover:border-rose-500/30 transition-all flex items-center justify-center"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
