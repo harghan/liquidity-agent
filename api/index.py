@@ -91,10 +91,12 @@ class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
-        path = parsed.path
         query = parse_qs(parsed.query)
+        req_path = self.headers.get("x-matched-path") or self.headers.get("x-forwarded-uri") or parsed.path
+        route_param = query.get("__route", [""])[0]
+        check_str = f"{req_path} {route_param} {parsed.path}".lower()
 
-        if path.endswith("/api/health") or path == "/api":
+        if "health" in check_str:
             return self._send_json({
                 "status": "healthy",
                 "service": "PRISM Liquidity Refraction Engine",
@@ -102,11 +104,11 @@ class handler(BaseHTTPRequestHandler):
                 "venues": ["Polymarket", "Kalshi"],
             })
 
-        if path.endswith("/api/ai/plan"):
+        if "ai" in check_str or "prompt" in query:
             prompt = query.get("prompt", ["Deploy $50k on Vivek Ramaswamy with < 20 bps slippage"])[0]
             return self._send_json(self._generate_ai_plan(prompt))
 
-        if path.endswith("/api/markets"):
+        if "markets" in check_str:
             events = [
                 {
                     "id": "vivek_2028",
@@ -147,7 +149,7 @@ class handler(BaseHTTPRequestHandler):
             ]
             return self._send_json({"events": events})
 
-        if path.endswith("/api/parity"):
+        if "parity" in check_str:
             parity_engine = ParityEngine(risk_free_rate=0.0480)
             opportunities = [
                 {
@@ -186,7 +188,11 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
-        path = parsed.path
+        query = parse_qs(parsed.query)
+        req_path = self.headers.get("x-matched-path") or self.headers.get("x-forwarded-uri") or parsed.path
+        route_param = query.get("__route", [""])[0]
+        check_str = f"{req_path} {route_param} {parsed.path}".lower()
+
         content_len = int(self.headers.get("Content-Length", 0))
         post_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
 
@@ -195,7 +201,7 @@ class handler(BaseHTTPRequestHandler):
         except Exception:
             body = {}
 
-        if path.endswith("/api/ai/plan"):
+        if "prompt" in body or "ai" in check_str:
             prompt = body.get("prompt", "Deploy $50k on Vivek Ramaswamy with < 20 bps slippage")
             return self._send_json(self._generate_ai_plan(prompt))
 
