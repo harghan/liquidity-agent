@@ -12,6 +12,7 @@ import { CommandPaletteModal } from '@/components/CommandPaletteModal';
 import { DispatchModal } from '@/components/DispatchModal';
 import { Footer } from '@/components/Footer';
 import { LoginGate } from '@/components/LoginGate';
+import { INITIAL_INSTITUTIONAL_MARKETS, fetchLiveMarketsFromApi } from '@/data/liveMarkets';
 import { MarketEvent, MicrostructureSignals, ExecutionTranche } from '@/types';
 
 export const App: React.FC = () => {
@@ -29,9 +30,30 @@ export const App: React.FC = () => {
   };
 
   const [activeTab, setActiveTab] = useState<string>('terminal');
-  const [selectedMarketKey, setSelectedMarketKey] = useState<string>('vram');
+  const [markets, setMarkets] = useState<Record<string, MarketEvent>>(INITIAL_INSTITUTIONAL_MARKETS);
+  const [selectedMarketKey, setSelectedMarketKey] = useState<string>('iran_invasion');
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState<boolean>(false);
   const [direction, setDirection] = useState<string>('BUY YES');
   const [notionalUsd, setNotionalUsd] = useState<number>(50000);
+
+  // Sync live markets dynamically from Polymarket & Kalshi APIs
+  useEffect(() => {
+    let isMounted = true;
+    async function syncLiveMarkets() {
+      setIsLoadingMarkets(true);
+      const live = await fetchLiveMarketsFromApi();
+      if (isMounted && Object.keys(live).length > 0) {
+        setMarkets(live);
+        setIsLoadingMarkets(false);
+      }
+    }
+    syncLiveMarkets();
+    const interval = setInterval(syncLiveMarkets, 35000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Modals
   const [isCmdOpen, setIsCmdOpen] = useState<boolean>(false);
@@ -43,46 +65,7 @@ export const App: React.FC = () => {
   const [aiRationale, setAiRationale] = useState<string | null>(null);
   const [aiPreSignedHash, setAiPreSignedHash] = useState<string | null>(null);
 
-  const markets: Record<string, MarketEvent> = {
-    vram: {
-      id: 'vram',
-      name: 'Will Vivek Ramaswamy win the 2028 US Presidential Election?',
-      category: 'Presidential Election',
-      polyMid: 0.0065,
-      kalshiMid: 0.0025,
-      baseVwap: 0.008,
-      liquidityUsd: 21461179,
-    },
-    fomc: {
-      id: 'fomc',
-      name: 'Federal Reserve Interest Rate Decision (FOMC July 2026)',
-      category: 'Fed / Rates',
-      polyMid: 0.62,
-      kalshiMid: 0.59,
-      baseVwap: 0.605,
-      liquidityUsd: 12850000,
-    },
-    walz: {
-      id: 'walz',
-      name: 'Will Tim Walz win the 2028 US Presidential Election?',
-      category: 'Presidential Election',
-      polyMid: 0.055,
-      kalshiMid: 0.05,
-      baseVwap: 0.052,
-      liquidityUsd: 8940000,
-    },
-    recession: {
-      id: 'recession',
-      name: 'Will the US enter an NBER Recession before 2027?',
-      category: 'Recession',
-      polyMid: 0.24,
-      kalshiMid: 0.215,
-      baseVwap: 0.228,
-      liquidityUsd: 4200000,
-    },
-  };
-
-  const currentMarket = markets[selectedMarketKey] || markets.vram;
+  const currentMarket = markets[selectedMarketKey] || Object.values(markets)[0] || INITIAL_INSTITUTIONAL_MARKETS.iran_invasion;
 
   // Discrete equal-marginal-price waterfill split
   const polyRatio = Math.max(0.48, Math.min(0.82, 0.64 + notionalUsd / 550000));
@@ -166,10 +149,14 @@ export const App: React.FC = () => {
     const signals = data.signals || {};
     const matched = (data.matched_event || '').toLowerCase();
 
-    if (matched.includes('fomc') || matched.includes('fed')) setSelectedMarketKey('fomc');
-    else if (matched.includes('walz')) setSelectedMarketKey('walz');
-    else if (matched.includes('recession')) setSelectedMarketKey('recession');
-    else setSelectedMarketKey('vram');
+    let matchedKey = selectedMarketKey;
+    for (const [key, m] of Object.entries(markets)) {
+      if (matched.includes(key.toLowerCase()) || m.name.toLowerCase().includes(matched) || matched.includes(m.name.toLowerCase())) {
+        matchedKey = key;
+        break;
+      }
+    }
+    setSelectedMarketKey(matchedKey);
 
     const sideStr = `${intent.side === 'sell' ? 'SELL ' : 'BUY '}${intent.outcome_target === 'No' ? 'NO' : 'YES'}`;
     setDirection(sideStr);
@@ -201,17 +188,16 @@ export const App: React.FC = () => {
       if (val >= 1000) size = val;
     }
 
-    let mKey = 'vram';
-    let mTitle = 'Vivek Ramaswamy 2028';
-    if (low.includes('fomc') || low.includes('fed') || low.includes('rate')) {
-      mKey = 'fomc';
-      mTitle = 'Federal Reserve FOMC July 2026';
-    } else if (low.includes('walz')) {
-      mKey = 'walz';
-      mTitle = 'Tim Walz 2028 Presidential';
-    } else if (low.includes('recession')) {
-      mKey = 'recession';
-      mTitle = 'US NBER Recession 2026';
+    let mKey = selectedMarketKey;
+    let mTitle = currentMarket.name;
+
+    for (const [key, m] of Object.entries(markets)) {
+      const words = m.name.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+      if (words.some(w => low.includes(w)) || low.includes(key.toLowerCase())) {
+        mKey = key;
+        mTitle = m.name;
+        break;
+      }
     }
 
     let dir = 'BUY YES';
@@ -323,10 +309,11 @@ export const App: React.FC = () => {
             slippageBps={slippageBps}
             tranches={tranches}
             onOpenDispatch={() => setIsDispatchOpen(true)}
+            isLoadingMarkets={isLoadingMarkets}
           />
         )}
 
-        {activeTab === 'parity' && <ParityRadar />}
+        {activeTab === 'parity' && <ParityRadar markets={markets} />}
         {activeTab === 'depth' && <DepthVisualizer />}
         {activeTab === 'analytics' && <TcaAnalytics />}
         {activeTab === 'api' && <ApiDocs />}

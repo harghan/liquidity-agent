@@ -6,6 +6,9 @@ export interface MarketEvent {
   kalshiMid: number;
   baseVwap: number;
   liquidityUsd: number;
+  volumeUsd?: number;
+  spreadBps?: number;
+  description?: string;
 }
 
 export interface MicrostructureSignals {
