@@ -112,7 +112,7 @@ def build_model():
 
     metrics_mapping = [
         ("Active Trading Desks", "='5-Year Pro-Forma'!C12", FMT_INT),
-        ("Monthly Routed Notional ($M)", "='5-Year Pro-Forma'!C13", FMT_CURR),
+        ("Avg Monthly Volume / Desk ($M)", "='5-Year Pro-Forma'!C13", "$#,##0.0"),
         ("Annual Routed Notional ($M)", "='5-Year Pro-Forma'!C14", FMT_CURR),
         ("---", None, None),
         ("SaaS Subscription Revenue", "='5-Year Pro-Forma'!C21", FMT_CURR),
@@ -340,15 +340,15 @@ def build_model():
     ws3.merge_cells("B16:G16")
 
     rev_rows = [
-        ("Tier 1: Core Quant API Revenue", ["=C8*'Model Assumptions'!C15*12", "=D8*'Model Assumptions'!C15*12", "=E8*'Model Assumptions'!C15*12", "=F8*'Model Assumptions'!C15*12", "=G8*'Model Assumptions'!C15*12"]),
-        ("Tier 2: Institutional Desk Revenue", ["=C9*'Model Assumptions'!C16*12", "=D9*'Model Assumptions'!C16*12", "=E9*'Model Assumptions'!C16*12", "=F9*'Model Assumptions'!C16*12", "=G9*'Model Assumptions'!C16*12"]),
-        ("Tier 3: Prime Direct Revenue", ["=C10*'Model Assumptions'!C17*12", "=D10*'Model Assumptions'!C17*12", "=E10*'Model Assumptions'!C17*12", "=F10*'Model Assumptions'!C17*12", "=G10*'Model Assumptions'!C17*12"]),
-        ("Tier 4: Sovereign Co-Lo Revenue", ["=C11*'Model Assumptions'!C18*12", "=D11*'Model Assumptions'!C18*12", "=E11*'Model Assumptions'!C18*12", "=F11*'Model Assumptions'!C18*12", "=G11*'Model Assumptions'!C18*12"]),
+        ("Tier 1: Core Quant API Revenue", ["=C8*'Model Assumptions'!C16*12", "=D8*'Model Assumptions'!C16*12", "=E8*'Model Assumptions'!C16*12", "=F8*'Model Assumptions'!C16*12", "=G8*'Model Assumptions'!C16*12"]),
+        ("Tier 2: Institutional Desk Revenue", ["=C9*'Model Assumptions'!C17*12", "=D9*'Model Assumptions'!C17*12", "=E9*'Model Assumptions'!C17*12", "=F9*'Model Assumptions'!C17*12", "=G9*'Model Assumptions'!C17*12"]),
+        ("Tier 3: Prime Direct Revenue", ["=C10*'Model Assumptions'!C18*12", "=D10*'Model Assumptions'!C18*12", "=E10*'Model Assumptions'!C18*12", "=F10*'Model Assumptions'!C18*12", "=G10*'Model Assumptions'!C18*12"]),
+        ("Tier 4: Sovereign Co-Lo Revenue", ["=C11*'Model Assumptions'!C19*12", "=D11*'Model Assumptions'!C19*12", "=E11*'Model Assumptions'!C19*12", "=F11*'Model Assumptions'!C19*12", "=G11*'Model Assumptions'!C19*12"]),
         ("Total SaaS Subscription Revenue (ARR)", ["=SUM(C17:C20)", "=SUM(D17:D20)", "=SUM(E17:E20)", "=SUM(F17:F20)", "=SUM(G17:G20)"]),
-        ("Volume Routing Take-Rate (1.5 bps)", ["=C14*1000000*'Model Assumptions'!C24", "=D14*1000000*'Model Assumptions'!C24", "=E14*1000000*'Model Assumptions'!C24", "=F14*1000000*'Model Assumptions'!C24", "=G14*1000000*'Model Assumptions'!C24"]),
+        ("Volume Routing Take-Rate (1.5 bps)", ["=C14*1000000*'Model Assumptions'!C25", "=D14*1000000*'Model Assumptions'!C25", "=E14*1000000*'Model Assumptions'!C25", "=F14*1000000*'Model Assumptions'!C25", "=G14*1000000*'Model Assumptions'!C25"]),
         ("Premium Data & Legal Oracle Feeds", [75000, 360000, 1100000, 2400000, 4200000]),
         ("Total Gross Contracted Revenue", ["=SUM(C21:C23)", "=SUM(D21:D23)", "=SUM(E21:E23)", "=SUM(F21:F23)", "=SUM(G21:G23)"]),
-        ("Less: Annual Prepay Cash Discounts", ["=-C21*'Model Assumptions'!C19*'Model Assumptions'!C20", "=-D21*'Model Assumptions'!C19*'Model Assumptions'!C20", "=-E21*'Model Assumptions'!C19*'Model Assumptions'!C20", "=-F21*'Model Assumptions'!C19*'Model Assumptions'!C20", "=-G21*'Model Assumptions'!C19*'Model Assumptions'!C20"]),
+        ("Less: Annual Prepay Cash Discounts", ["=-C21*'Model Assumptions'!C20*'Model Assumptions'!C21", "=-D21*'Model Assumptions'!C20*'Model Assumptions'!C21", "=-E21*'Model Assumptions'!C20*'Model Assumptions'!C21", "=-F21*'Model Assumptions'!C20*'Model Assumptions'!C21", "=-G21*'Model Assumptions'!C20*'Model Assumptions'!C21"]),
         ("NET RECOGNIZED REVENUE", ["=C24+C25", "=D24+D25", "=E24+E25", "=F24+F25", "=G24+G25"]),
     ]
 
@@ -373,10 +373,10 @@ def build_model():
     ws3.merge_cells("B28:G28")
 
     cogs_rows = [
-        ("Equinix NY4 Co-Location & Cross-Connects", ["=('Model Assumptions'!C36*12)+(C12*'Model Assumptions'!C37*12/10)", "=('Model Assumptions'!C36*12)+(D12*'Model Assumptions'!C37*12/10)", "=('Model Assumptions'!C36*12)+(E12*'Model Assumptions'!C37*12/10)", "=('Model Assumptions'!C36*12)+(F12*'Model Assumptions'!C37*12/10)", "=('Model Assumptions'!C36*12)+(G12*'Model Assumptions'!C37*12/10)"]),
-        ("Enterprise RPC Nodes & L2 Gas Relayers", ["='Model Assumptions'!C38*12", "='Model Assumptions'!C38*12*1.8", "='Model Assumptions'!C38*12*3.2", "='Model Assumptions'!C38*12*5.5", "='Model Assumptions'!C38*12*8.0"]),
-        ("Cloud Compute, Redis & WebSocket Relays", ["=('Model Assumptions'!C39*12)+(C14*'Model Assumptions'!C40)", "=('Model Assumptions'!C39*12)+(D14*'Model Assumptions'!C40)", "=('Model Assumptions'!C39*12)+(E14*'Model Assumptions'!C40)", "=('Model Assumptions'!C39*12)+(F14*'Model Assumptions'!C40)", "=('Model Assumptions'!C39*12)+(G14*'Model Assumptions'!C40)"]),
-        ("FIPS 140-2 Hardware HSM Cryptographic Security", ["='Model Assumptions'!C41*12", "='Model Assumptions'!C41*12*1.5", "='Model Assumptions'!C41*12*2.2", "='Model Assumptions'!C41*12*3.5", "='Model Assumptions'!C41*12*5.0"]),
+        ("Equinix NY4 Co-Location & Cross-Connects", ["=('Model Assumptions'!C39*12)+(C12*'Model Assumptions'!C40*12/10)", "=('Model Assumptions'!C39*12)+(D12*'Model Assumptions'!C40*12/10)", "=('Model Assumptions'!C39*12)+(E12*'Model Assumptions'!C40*12/10)", "=('Model Assumptions'!C39*12)+(F12*'Model Assumptions'!C40*12/10)", "=('Model Assumptions'!C39*12)+(G12*'Model Assumptions'!C40*12/10)"]),
+        ("Enterprise RPC Nodes & L2 Gas Relayers", ["='Model Assumptions'!C41*12", "='Model Assumptions'!C41*12*1.8", "='Model Assumptions'!C41*12*3.2", "='Model Assumptions'!C41*12*5.5", "='Model Assumptions'!C41*12*8.0"]),
+        ("Cloud Compute, Redis & WebSocket Relays", ["=('Model Assumptions'!C42*12)+(C14*'Model Assumptions'!C43)", "=('Model Assumptions'!C42*12)+(D14*'Model Assumptions'!C43)", "=('Model Assumptions'!C42*12)+(E14*'Model Assumptions'!C43)", "=('Model Assumptions'!C42*12)+(F14*'Model Assumptions'!C43)", "=('Model Assumptions'!C42*12)+(G14*'Model Assumptions'!C43)"]),
+        ("FIPS 140-2 Hardware HSM Cryptographic Security", ["='Model Assumptions'!C44*12", "='Model Assumptions'!C44*12*1.5", "='Model Assumptions'!C44*12*2.2", "='Model Assumptions'!C44*12*3.5", "='Model Assumptions'!C44*12*5.0"]),
         ("TOTAL COST OF GOODS SOLD", ["=SUM(C29:C32)", "=SUM(D29:D32)", "=SUM(E29:E32)", "=SUM(F29:F32)", "=SUM(G29:G32)"]),
         ("GROSS PROFIT", ["=C26-C33", "=D26-D33", "=E26-E33", "=F26-F33", "=G26-G33"]),
         ("Gross Margin %", ["=C34/C26", "=D34/D26", "=E34/E26", "=F34/F26", "=G34/G26"]),
@@ -445,7 +445,7 @@ def build_model():
 
     r_idx = 45
     for label, vals in profit_rows:
-        is_pct = "%" in label
+        is_pct = "Margin %" in label
         is_net = "NET INCOME" in label
         is_ebitda = "EBITDA" in label
         ws3.cell(row=r_idx, column=2, value=label).font = bold_font if is_net or is_ebitda else regular_font
@@ -486,7 +486,7 @@ def build_model():
         ("---", None),
         ("CASH INFLOWS:", None),
         ("Active Client Desks", [1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12]),
-        ("Monthly Subscription Inflows", ["=C9*'Model Assumptions'!C16", "=D9*'Model Assumptions'!C16", "=E9*'Model Assumptions'!C16", "=F9*'Model Assumptions'!C16", "=G9*'Model Assumptions'!C16", "=H9*'Model Assumptions'!C16", "=I9*'Model Assumptions'!C16", "=J9*'Model Assumptions'!C16", "=K9*'Model Assumptions'!C16", "=L9*'Model Assumptions'!C16", "=M9*'Model Assumptions'!C16", "=N9*'Model Assumptions'!C16"]),
+        ("Monthly Subscription Inflows", ["=C9*'Model Assumptions'!C17", "=D9*'Model Assumptions'!C17", "=E9*'Model Assumptions'!C17", "=F9*'Model Assumptions'!C17", "=G9*'Model Assumptions'!C17", "=H9*'Model Assumptions'!C17", "=I9*'Model Assumptions'!C17", "=J9*'Model Assumptions'!C17", "=K9*'Model Assumptions'!C17", "=L9*'Model Assumptions'!C17", "=M9*'Model Assumptions'!C17", "=N9*'Model Assumptions'!C17"]),
         ("Annual Upfront Prepay Cash Float", [122400, 0, 122400, 0, 122400, 122400, 0, 122400, 0, 122400, 122400, 122400]),
         ("Variable Volume Routing Fees", [2500, 3200, 5400, 7800, 10500, 13200, 16800, 20400, 24500, 29000, 34000, 41000]),
         ("Treasury Yield (Cash Sweep @ 4.8%)", ["=C6*0.048/12", "=D6*0.048/12", "=E6*0.048/12", "=F6*0.048/12", "=G6*0.048/12", "=H6*0.048/12", "=I6*0.048/12", "=J6*0.048/12", "=K6*0.048/12", "=L6*0.048/12", "=M6*0.048/12", "=N6*0.048/12"]),
