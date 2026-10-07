@@ -200,7 +200,7 @@ export const OverviewLanding: React.FC<OverviewLandingProps> = ({ onOpenCmd, onN
             </div>
             <h3 className="text-base font-bold text-white">Synthetic Parity vs SOFR Hurdle</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Evaluates $P_{YES} + P_{NO} \le 1.00$ arbitrage against the risk-free Treasury benchmark (4.80%), automatically protecting desks from 200% margin lockups.
+              Evaluates P(YES) + P(NO) ≤ 1.00 arbitrage against the risk-free Treasury benchmark (4.80%), automatically protecting desks from 200% margin lockups.
             </p>
           </div>
         </div>

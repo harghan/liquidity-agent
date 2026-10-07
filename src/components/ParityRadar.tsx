@@ -118,7 +118,7 @@ export const ParityRadar: React.FC<ParityRadarProps> = ({ markets = {} }) => {
         <div className="text-xs text-slate-300 space-y-1">
           <div className="font-bold text-amber-300">Institutional Capital Lockup Notice</div>
           <p className="leading-relaxed text-slate-400">
-            In binary event markets, completing cross-venue synthetic parity requires simultaneously purchasing both legs ($P_{'{YES}'} + P_{'{NO}'} \le 1.00$). Without portfolio cross-margining, taking both sides requires locking 200% gross margin until official oracle determination. PRISM automatically flags any spread yielding less than the risk-free SOFR benchmark (4.80%) as capital-destructive.
+            In binary event markets, completing cross-venue synthetic parity requires simultaneously purchasing both legs (P(YES) + P(NO) ≤ 1.00). Without portfolio cross-margining, taking both sides requires locking 200% gross margin until official oracle determination. PRISM automatically flags any spread yielding less than the risk-free SOFR benchmark (4.80%) as capital-destructive.
           </p>
         </div>
       </div>

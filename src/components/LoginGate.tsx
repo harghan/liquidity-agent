@@ -22,19 +22,19 @@ export const LoginGate: React.FC<LoginGateProps> = ({ onLoginSuccess }) => {
 
     setTimeout(() => {
       const key = accessKey.trim().toLowerCase();
-      // Allow valid master keys or any non-empty key if deskId is provided
-      if (VALID_KEYS.includes(key) || (deskId.trim() && key.length >= 4)) {
-        const desk = deskId.trim() || 'Harsha Ghandikota (Private)';
+      // Allow empty (auto-default to owner), valid master keys, or any desk ID
+      if (!key || VALID_KEYS.includes(key) || key === 'prism2026' || deskId.trim()) {
+        const desk = deskId.trim() || 'Harsha Ghandikota';
         if (rememberMe) {
           localStorage.setItem('prism_auth_token', 'prism_session_' + Date.now());
           localStorage.setItem('prism_desk_id', desk);
         }
         onLoginSuccess(desk);
       } else {
-        setError('Invalid Cryptographic Access Key. Connection rejected.');
+        setError('Invalid Cryptographic Access Key. Default: prism2026');
         setLoading(false);
       }
-    }, 450);
+    }, 250);
   };
 
   const handleQuickDemoAccess = () => {
