@@ -61,7 +61,23 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     },
     {
-      title: 'Navigate to Synthetic Parity Radar',
+      title: 'Navigate to Flagship Overview',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('overview');
+        onClose();
+      },
+    },
+    {
+      title: 'Launch Terminal (SOR Workstation · 60+ Live Bets)',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('terminal');
+        onClose();
+      },
+    },
+    {
+      title: 'Navigate to Synthetic Parity Radar vs SOFR',
       type: 'Navigation',
       action: () => {
         onSelectTab('parity');
@@ -69,10 +85,42 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     },
     {
-      title: 'Inspect Cross-Venue Microstructure Depth',
+      title: 'Navigate to Oracle Resolution Auditor & Conflict Guard',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('auditor');
+        onClose();
+      },
+    },
+    {
+      title: 'Inspect Cross-Venue Microstructure Depth (L2/L3)',
       type: 'Navigation',
       action: () => {
         onSelectTab('depth');
+        onClose();
+      },
+    },
+    {
+      title: 'Open Pre-Trade TCA Shortfall Analytics',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('analytics');
+        onClose();
+      },
+    },
+    {
+      title: 'View Institutional Commercial Pricing Tiers',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('pricing');
+        onClose();
+      },
+    },
+    {
+      title: 'Inspect Developer API & Non-Custodial SDK',
+      type: 'Navigation',
+      action: () => {
+        onSelectTab('api');
         onClose();
       },
     },

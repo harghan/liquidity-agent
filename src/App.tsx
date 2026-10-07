@@ -5,15 +5,32 @@ import { OpticalRefractionCanvas } from '@/components/OpticalRefractionCanvas';
 import { AiMandateBar } from '@/components/AiMandateBar';
 import { SorTerminal } from '@/components/SorTerminal';
 import { ParityRadar } from '@/components/ParityRadar';
+import { OracleAuditor } from '@/components/OracleAuditor';
 import { DepthVisualizer } from '@/components/DepthVisualizer';
 import { TcaAnalytics } from '@/components/TcaAnalytics';
+import { PricingTiers } from '@/components/PricingTiers';
 import { ApiDocs } from '@/components/ApiDocs';
+import { OverviewLanding } from '@/components/OverviewLanding';
 import { CommandPaletteModal } from '@/components/CommandPaletteModal';
 import { DispatchModal } from '@/components/DispatchModal';
 import { Footer } from '@/components/Footer';
 import { LoginGate } from '@/components/LoginGate';
 import { INITIAL_INSTITUTIONAL_MARKETS, fetchLiveMarketsFromApi } from '@/data/liveMarkets';
 import { MarketEvent, MicrostructureSignals, ExecutionTranche } from '@/types';
+
+const getTabFromLocation = (): string => {
+  if (typeof window === 'undefined') return 'overview';
+  const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+  if (path === '' || path === 'overview') return 'overview';
+  if (path === 'terminal') return 'terminal';
+  if (path === 'parity') return 'parity';
+  if (path === 'auditor') return 'auditor';
+  if (path === 'depth') return 'depth';
+  if (path === 'tca' || path === 'analytics') return 'analytics';
+  if (path === 'pricing') return 'pricing';
+  if (path === 'api') return 'api';
+  return 'overview';
+};
 
 export const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -29,12 +46,31 @@ export const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
-  const [activeTab, setActiveTab] = useState<string>('terminal');
+  const [activeTab, setActiveTab] = useState<string>(getTabFromLocation);
   const [markets, setMarkets] = useState<Record<string, MarketEvent>>(INITIAL_INSTITUTIONAL_MARKETS);
   const [selectedMarketKey, setSelectedMarketKey] = useState<string>('iran_invasion');
   const [isLoadingMarkets, setIsLoadingMarkets] = useState<boolean>(false);
   const [direction, setDirection] = useState<string>('BUY YES');
   const [notionalUsd, setNotionalUsd] = useState<number>(50000);
+
+  // Sync tab with browser URL history
+  const handleTabChange = (tabId: string) => {
+    const normalized = tabId === 'tca' ? 'analytics' : tabId;
+    setActiveTab(normalized);
+    const path = normalized === 'overview' ? '/' : `/${normalized === 'analytics' ? 'tca' : normalized}`;
+    if (window.location.pathname !== path) {
+      window.history.pushState({ tab: normalized }, '', path);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const onPopState = () => {
+      setActiveTab(getTabFromLocation());
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // Sync live markets dynamically from Polymarket & Kalshi APIs
   useEffect(() => {
@@ -265,57 +301,80 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#060709] text-slate-100 selection:bg-sky-500/20 selection:text-sky-300">
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         onOpenCmd={() => setIsCmdOpen(true)}
         authenticatedDesk={deskId}
         onLogout={handleLogout}
       />
 
-      <main className="max-w-6xl mx-auto px-6 md:px-8 py-10 w-full">
-        <Hero onOpenCmd={() => setIsCmdOpen(true)} />
-
-        <OpticalRefractionCanvas
-          notionalUsd={notionalUsd}
-          polyAmount={polyAmount}
-          kalshiAmount={kalshiAmount}
-          polyPct={polyPct}
-          kalshiPct={kalshiPct}
-        />
-
-        <AiMandateBar
-          onExecutePrompt={handleExecutePrompt}
-          signals={aiSignals}
-          rationale={aiRationale}
-          preSignedHash={aiPreSignedHash}
-          loading={aiLoading}
-        />
-
-        {/* Tab Views */}
-        {activeTab === 'terminal' && (
-          <SorTerminal
-            markets={markets}
-            selectedMarketKey={selectedMarketKey}
-            setSelectedMarketKey={setSelectedMarketKey}
-            direction={direction}
-            setDirection={setDirection}
-            notionalUsd={notionalUsd}
-            setNotionalUsd={setNotionalUsd}
-            polyAmount={polyAmount}
-            kalshiAmount={kalshiAmount}
-            polyPct={polyPct}
-            kalshiPct={kalshiPct}
-            effectiveVwap={effectiveVwap}
-            capturedAlpha={capturedAlpha}
-            slippageBps={slippageBps}
-            tranches={tranches}
-            onOpenDispatch={() => setIsDispatchOpen(true)}
-            isLoadingMarkets={isLoadingMarkets}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-10 w-full flex-1">
+        {/* Tab 1: Overview Landing (Apple Pro / Jony Ive flagship presentation) */}
+        {activeTab === 'overview' && (
+          <OverviewLanding
+            onOpenCmd={() => setIsCmdOpen(true)}
+            onNavigateTab={handleTabChange}
           />
         )}
 
+        {/* Tab 2: Terminal (SOR Workstation with 60+ Live Prediction Bets) */}
+        {activeTab === 'terminal' && (
+          <div className="space-y-10">
+            <Hero onOpenCmd={() => setIsCmdOpen(true)} />
+
+            <OpticalRefractionCanvas
+              notionalUsd={notionalUsd}
+              polyAmount={polyAmount}
+              kalshiAmount={kalshiAmount}
+              polyPct={polyPct}
+              kalshiPct={kalshiPct}
+            />
+
+            <AiMandateBar
+              onExecutePrompt={handleExecutePrompt}
+              signals={aiSignals}
+              rationale={aiRationale}
+              preSignedHash={aiPreSignedHash}
+              loading={aiLoading}
+            />
+
+            <SorTerminal
+              markets={markets}
+              selectedMarketKey={selectedMarketKey}
+              setSelectedMarketKey={setSelectedMarketKey}
+              direction={direction}
+              setDirection={setDirection}
+              notionalUsd={notionalUsd}
+              setNotionalUsd={setNotionalUsd}
+              polyAmount={polyAmount}
+              kalshiAmount={kalshiAmount}
+              polyPct={polyPct}
+              kalshiPct={kalshiPct}
+              effectiveVwap={effectiveVwap}
+              capturedAlpha={capturedAlpha}
+              slippageBps={slippageBps}
+              tranches={tranches}
+              onOpenDispatch={() => setIsDispatchOpen(true)}
+              isLoadingMarkets={isLoadingMarkets}
+            />
+          </div>
+        )}
+
+        {/* Tab 3: Synthetic Parity Radar */}
         {activeTab === 'parity' && <ParityRadar markets={markets} />}
+
+        {/* Tab 4: Oracle Resolution Auditor & Conflict Guard */}
+        {activeTab === 'auditor' && <OracleAuditor />}
+
+        {/* Tab 5: Microstructure Depth L2/L3 */}
         {activeTab === 'depth' && <DepthVisualizer />}
+
+        {/* Tab 6: Pre-Trade TCA Shortfall Analytics */}
         {activeTab === 'analytics' && <TcaAnalytics />}
+
+        {/* Tab 7: Commercial Pricing Tiers */}
+        {activeTab === 'pricing' && <PricingTiers />}
+
+        {/* Tab 8: Developer API & Non-Custodial Gateway */}
         {activeTab === 'api' && <ApiDocs />}
       </main>
 
@@ -326,10 +385,10 @@ export const App: React.FC = () => {
         isOpen={isCmdOpen}
         onClose={() => setIsCmdOpen(false)}
         onSelectPrompt={(p) => {
-          setActiveTab('terminal');
+          handleTabChange('terminal');
           handleExecutePrompt(p);
         }}
-        onSelectTab={(tabId) => setActiveTab(tabId)}
+        onSelectTab={(tabId) => handleTabChange(tabId)}
       />
 
       <DispatchModal
