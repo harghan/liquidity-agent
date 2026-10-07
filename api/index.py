@@ -194,6 +194,21 @@ class handler(BaseHTTPRequestHandler):
         route_param = query.get("__route", [""])[0]
         check_str = f"{req_path} {route_param} {parsed.path}".lower()
 
+        accept = self.headers.get("Accept", "").lower()
+        if "text/html" in accept or any(r in check_str for r in ["/terminal", "/parity", "/auditor", "/depth", "/tca", "/pricing", "/overview"]):
+            index_path = ROOT_DIR / "public" / "index.html"
+            if not index_path.exists():
+                index_path = ROOT_DIR / "dist" / "index.html"
+            if index_path.exists():
+                body = index_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.send_header("Cache-Control", "public, max-age=0, must-revalidate")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
         if "health" in check_str:
             return self._send_json({
                 "status": "healthy",
