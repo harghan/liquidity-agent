@@ -21,55 +21,85 @@ def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
         tcMar.append(node)
     tcPr.append(tcMar)
 
+def set_booktabs_borders(table):
+    """Apply classic Booktabs borders: top thin line, bottom thin line, header bottom line."""
+    tblPr = table._tbl.tblPr
+    borders_elm = parse_xml(
+        f'<w:tblBorders {nsdecls("w")}>'
+        f'  <w:top w:val="single" w:sz="6" w:space="0" w:color="0F172A"/>'
+        f'  <w:bottom w:val="single" w:sz="6" w:space="0" w:color="0F172A"/>'
+        f'  <w:insideH w:val="none"/>'
+        f'  <w:insideV w:val="none"/>'
+        f'  <w:left w:val="none"/>'
+        f'  <w:right w:val="none"/>'
+        f'</w:tblBorders>'
+    )
+    tblPr.append(borders_elm)
+
 def generate_docx(output_path):
     doc = Document()
     
-    # 0.75 in margins
+    # 0.9 in margins for elegant editorial proportions
     for sec in doc.sections:
-        sec.top_margin = Inches(0.75)
-        sec.bottom_margin = Inches(0.75)
-        sec.left_margin = Inches(0.75)
-        sec.right_margin = Inches(0.75)
+        sec.top_margin = Inches(0.9)
+        sec.bottom_margin = Inches(0.9)
+        sec.left_margin = Inches(0.9)
+        sec.right_margin = Inches(0.9)
 
-    # Document Header / Title
+    FONT_FAMILY = "Georgia"
+
+    # Header / Title Block
     title = doc.add_paragraph()
     r_title = title.add_run("SITUATIONAL AWARENESS IN THE AGE OF EVENT DERIVATIVES")
-    r_title.font.name = "Arial"
-    r_title.font.size = Pt(20)
+    r_title.font.name = FONT_FAMILY
+    r_title.font.size = Pt(22)
     r_title.font.bold = True
     r_title.font.color.rgb = RGBColor(15, 23, 42) # Slate 900
+    title.paragraph_format.space_before = Pt(12)
     title.paragraph_format.space_after = Pt(4)
 
     sub = doc.add_paragraph()
     r_sub = sub.add_run("On Epistemic Sovereignty, the Collapse of Consensus Pricing, and the Necessity of Institutional Routing Architecture")
-    r_sub.font.name = "Arial"
-    r_sub.font.size = Pt(11.5)
-    r_sub.font.color.rgb = RGBColor(37, 99, 235) # Blue 600
-    r_sub.font.bold = True
-    sub.paragraph_format.space_after = Pt(6)
+    r_sub.font.name = FONT_FAMILY
+    r_sub.font.size = Pt(12)
+    r_sub.font.italic = True
+    r_sub.font.color.rgb = RGBColor(71, 85, 105) # Slate 600
+    sub.paragraph_format.space_after = Pt(10)
 
     meta = doc.add_paragraph()
-    r_meta = meta.add_run("By PRISM Technologies Inc.  |  Quantitative Research & Systems Architecture  |  October 2026")
-    r_meta.font.name = "Arial"
+    r_meta = meta.add_run("PRISM Technologies Inc.   |   Quantitative Systems & Macro Research   |   October 2026")
+    r_meta.font.name = FONT_FAMILY
     r_meta.font.size = Pt(9)
     r_meta.font.color.rgb = RGBColor(100, 116, 139) # Slate 500
-    r_meta.font.bold = True
-    meta.paragraph_format.space_after = Pt(12)
+    meta.paragraph_format.space_after = Pt(16)
 
-    # Epigraph Quote Box
+    # Epigraph Quote
     q_table = doc.add_table(rows=1, cols=1)
     q_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     q_cell = q_table.cell(0, 0)
     set_cell_background(q_cell, "F8FAFC")
-    set_cell_margins(q_cell, top=140, bottom=140, left=200, right=200)
+    set_cell_margins(q_cell, top=160, bottom=160, left=220, right=220)
+    
+    # Border on left of quote
+    tcPr = q_cell._tc.get_or_add_tcPr()
+    tcBorders = parse_xml(
+        f'<w:tcBorders {nsdecls("w")}>'
+        f'  <w:left w:val="single" w:sz="12" w:space="0" w:color="0F172A"/>'
+        f'  <w:top w:val="none"/>'
+        f'  <w:right w:val="none"/>'
+        f'  <w:bottom w:val="none"/>'
+        f'</w:tcBorders>'
+    )
+    tcPr.append(tcBorders)
     
     qp = q_cell.paragraphs[0]
     qr = qp.add_run('“The most contrarian thing of all is not to oppose the crowd, but to think for yourself. Yet when markets become liquid enough to price the future itself, truth ceases to be a philosophical pursuit—it becomes an engineering bottleneck.”\n\n— Peter Thiel, Zero to One (Adapted)')
-    qr.font.name = "Arial"
-    qr.font.size = Pt(9.5)
+    qr.font.name = FONT_FAMILY
+    qr.font.size = Pt(10)
     qr.font.italic = True
     qr.font.color.rgb = RGBColor(51, 65, 85)
-    doc.add_paragraph().paragraph_format.space_after = Pt(10)
+    
+    doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
     # Executive Summary Metric Cards Table
     m_table = doc.add_table(rows=2, cols=3)
@@ -79,64 +109,65 @@ def generate_docx(output_path):
         ("14.2 Seconds", "Cross-Venue Latency Window Between Kalshi & Poly"),
         ("19.7x", "Alpha Preservation Multiple (Slippage Saved / Fee Paid)"),
         ("$320 Billion", "Projected 2030 Epistemic Event Contract Notional"),
-        ("< 0.5 Milliseconds", "Equinix NY4 FPGA Atomic Parent-Order Split Path"),
+        ("< 0.50 ms", "Equinix NY4 FPGA Atomic Parent-Order Split Path"),
         ("99.95%", "Non-Custodial Multi-Venue Execution Uptime SLA"),
     ]
 
     for idx, (val, desc) in enumerate(metrics):
         r_i, c_i = divmod(idx, 3)
         cell = m_table.cell(r_i, c_i)
-        set_cell_background(cell, "F1F5F9")
-        set_cell_margins(cell, top=120, bottom=120, left=140, right=140)
+        set_cell_background(cell, "F8FAFC")
+        set_cell_margins(cell, top=140, bottom=140, left=140, right=140)
         p = cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
         r1 = p.add_run(val + "\n")
-        r1.font.name = "Arial"
-        r1.font.size = Pt(12)
+        r1.font.name = FONT_FAMILY
+        r1.font.size = Pt(13)
         r1.font.bold = True
         r1.font.color.rgb = RGBColor(15, 23, 42)
         
         r2 = p.add_run(desc)
-        r2.font.name = "Arial"
-        r2.font.size = Pt(7.5)
+        r2.font.name = FONT_FAMILY
+        r2.font.size = Pt(8)
         r2.font.color.rgb = RGBColor(100, 116, 139)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    # Helper for Headings
+    # Typography Helpers
     def add_h1(text):
         h = doc.add_paragraph()
         r = h.add_run(text)
-        r.font.name = "Arial"
-        r.font.size = Pt(13)
+        r.font.name = FONT_FAMILY
+        r.font.size = Pt(13.5)
         r.font.bold = True
         r.font.color.rgb = RGBColor(15, 23, 42)
-        h.paragraph_format.space_before = Pt(14)
+        h.paragraph_format.space_before = Pt(18)
         h.paragraph_format.space_after = Pt(6)
 
     def add_p(text):
         p = doc.add_paragraph()
         r = p.add_run(text)
-        r.font.name = "Arial"
-        r.font.size = Pt(9.5)
+        r.font.name = FONT_FAMILY
+        r.font.size = Pt(10)
         r.font.color.rgb = RGBColor(30, 41, 59)
-        p.paragraph_format.space_after = Pt(6)
-        p.paragraph_format.line_spacing = 1.15
+        p.paragraph_format.space_after = Pt(7)
+        p.paragraph_format.line_spacing = 1.25
 
     def add_bullet(bold_prefix, text):
         p = doc.add_paragraph(style='List Bullet')
         r_bold = p.add_run(bold_prefix + ": ")
-        r_bold.font.name = "Arial"
-        r_bold.font.size = Pt(9.5)
+        r_bold.font.name = FONT_FAMILY
+        r_bold.font.size = Pt(10)
         r_bold.font.bold = True
         r_bold.font.color.rgb = RGBColor(15, 23, 42)
 
         r_body = p.add_run(text)
-        r_body.font.name = "Arial"
-        r_body.font.size = Pt(9.5)
+        r_body.font.name = FONT_FAMILY
+        r_body.font.size = Pt(10)
         r_body.font.color.rgb = RGBColor(30, 41, 59)
-        p.paragraph_format.space_after = Pt(4)
+        p.paragraph_format.space_after = Pt(5)
+        p.paragraph_format.line_spacing = 1.25
 
     # Prologue
     add_h1("PROLOGUE: THE SOVEREIGN TRUTH PROBLEM")
@@ -151,23 +182,23 @@ def generate_docx(output_path):
     add_bullet("The Domestic CFTC-Regulated Exchange (Kalshi)", "Fedwire USD clearinghouse collateral, LedgerX clearing heritage, position limits, formal regulatory legalism. Safe for compliant American capital, but structurally starved of global non-US liquidity.")
     add_bullet("The Traditional Multi-Asset Incumbent (ForecastEx / IBKR)", "Embedded within institutional prime brokerage, but hobbled by legacy T+1 execution pipelines and retail-centric brokerage interfaces.")
 
-    # Image 1
-    chart1_path = "/Users/harshaghandikota/Liquidity Agent/public/chart_divergence.png"
+    # Image 1: Editorial Chart
+    chart1_path = "/Users/harshaghandikota/Liquidity Agent/public/chart_divergence_editorial.png"
     if os.path.exists(chart1_path):
         p_img = doc.add_paragraph()
         p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.paragraph_format.space_before = Pt(8)
+        p_img.paragraph_format.space_before = Pt(10)
         p_img.paragraph_format.space_after = Pt(2)
-        doc.add_picture(chart1_path, width=Inches(6.8))
+        doc.add_picture(chart1_path, width=Inches(6.6))
         
         cap = doc.add_paragraph()
         cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
         c_r = cap.add_run("Figure 1: High-Frequency Tick-Level Cross-Venue Price Divergence during Macro Shock Event (Kalshi CLOB vs Polymarket CLOB). Shaded area represents 480 bps open arbitrage window persisting for 14.2 seconds.")
-        c_r.font.name = "Arial"
-        c_r.font.size = Pt(8)
+        c_r.font.name = FONT_FAMILY
+        c_r.font.size = Pt(8.5)
         c_r.font.italic = True
         c_r.font.color.rgb = RGBColor(100, 116, 139)
-        cap.paragraph_format.space_after = Pt(10)
+        cap.paragraph_format.space_after = Pt(12)
 
     add_p("When an event of geopolitical or macroeconomic consequence breaks, the clearing price of reality does not adjust simultaneously. On Kalshi, the probability of an emergency Fed rate cut re-prices from 57.6¢ to 62.4¢ in t = 2.5s driven by domestic electronic bankwires. On Polymarket, delayed by cross-chain bridging and oracle dispute latency, the exact same contract prints at 57.6¢ for 14.2 seconds. The peak spread is 480 basis points.")
     add_p("For a systematic fund attempting to execute $1,000,000 of directional risk, routing into a single venue results in catastrophic market impact: an average of 296 basis points burned simply crossing fragmented order books. This is not a liquidity shortage; it is an arbitrage routing failure.")
@@ -176,38 +207,40 @@ def generate_docx(output_path):
     add_h1("II. EXECUTION SLIPPAGE & THE LIQUIDITY SCALING LAW")
     add_p("In AI scaling, the Bitter Lesson dictates that general methods leveraging compute always triumph over handcrafted rules. In capital markets, an identical mathematical law holds: Capital clusters exclusively where execution slippage approaches zero.")
 
-    # Image 2
-    chart2_path = "/Users/harshaghandikota/Liquidity Agent/public/chart_slippage_and_scaling.png"
+    # Image 2: Editorial Chart
+    chart2_path = "/Users/harshaghandikota/Liquidity Agent/public/chart_slippage_and_scaling_editorial.png"
     if os.path.exists(chart2_path):
         p_img2 = doc.add_paragraph()
         p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img2.paragraph_format.space_before = Pt(8)
+        p_img2.paragraph_format.space_before = Pt(10)
         p_img2.paragraph_format.space_after = Pt(2)
-        doc.add_picture(chart2_path, width=Inches(6.8))
+        doc.add_picture(chart2_path, width=Inches(6.6))
         
         cap2 = doc.add_paragraph()
         cap2.alignment = WD_ALIGN_PARAGRAPH.CENTER
         c_r2 = cap2.add_run("Figure 2: (Left) Execution Slippage Curve vs Notional Order Size: Single-Venue vs PRISM Atomic Smart Router. (Right) Global Event Derivatives Volume Scaling Law (2026 - 2030) with PRISM Routed Flow Capture.")
-        c_r2.font.name = "Arial"
-        c_r2.font.size = Pt(8)
+        c_r2.font.name = FONT_FAMILY
+        c_r2.font.size = Pt(8.5)
         c_r2.font.italic = True
         c_r2.font.color.rgb = RGBColor(100, 116, 139)
-        cap2.paragraph_format.space_after = Pt(10)
+        cap2.paragraph_format.space_after = Pt(12)
 
-    # Slippage Matrix Table
+    # Slippage Matrix Table (Booktabs Style)
     s_table = doc.add_table(rows=6, cols=4)
     s_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_booktabs_borders(s_table)
+    
     s_headers = ["Notional Order Size", "Single-Venue Fill", "PRISM Atomic Routed", "Net Alpha Preserved"]
     for c_i, h in enumerate(s_headers):
         cell = s_table.cell(0, c_i)
-        set_cell_background(cell, "1E293B")
-        set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
+        set_cell_background(cell, "F1F5F9")
+        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
         p = cell.paragraphs[0]
         r = p.add_run(h)
-        r.font.name = "Arial"
-        r.font.size = Pt(8.5)
+        r.font.name = FONT_FAMILY
+        r.font.size = Pt(9)
         r.font.bold = True
-        r.font.color.rgb = RGBColor(255, 255, 255)
+        r.font.color.rgb = RGBColor(15, 23, 42)
 
     s_rows = [
         ("$25,000 USD", "18 bps", "3 bps", "15 bps (83.3%)"),
@@ -220,13 +253,13 @@ def generate_docx(output_path):
     for r_i, row in enumerate(s_rows, start=1):
         for c_i, val in enumerate(row):
             cell = s_table.cell(r_i, c_i)
-            bg = "F8FAFC" if r_i % 2 == 1 else "FFFFFF"
+            bg = "FAFAFA" if r_i % 2 == 1 else "FFFFFF"
             set_cell_background(cell, bg)
-            set_cell_margins(cell, top=60, bottom=60, left=100, right=100)
+            set_cell_margins(cell, top=80, bottom=80, left=120, right=120)
             p = cell.paragraphs[0]
             r = p.add_run(val)
-            r.font.name = "Arial"
-            r.font.size = Pt(8.5)
+            r.font.name = FONT_FAMILY
+            r.font.size = Pt(9)
             r.font.bold = (c_i == 3)
             r.font.color.rgb = RGBColor(15, 23, 42)
 
@@ -250,38 +283,40 @@ def generate_docx(output_path):
     add_h1("V. INSTITUTIONAL INTEGRATION SPECIFICATION")
     spec_table = doc.add_table(rows=5, cols=2)
     spec_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_booktabs_borders(spec_table)
+    
     specs = [
         ("Interface Protocol", "FIX 4.4 Engine / Low-Latency REST / Streaming WebSocket"),
-        ("Co-Location Datacenter", "Equinix NY4 (Secaucus, NJ) • 10Gbps Cross-Connects"),
-        ("Throughput Capacity", "100,000 orders/sec burst capacity with deterministic lot routing"),
+        ("Co-Location Datacenter", "Equinix NY4 (Secaucus, NJ) • 10Gbps Dedicated Cross-Connects"),
+        ("Throughput Capacity", "100,000 orders/sec burst capacity with deterministic micro-lot routing"),
         ("Latency Execution SLA", "< 0.50 Milliseconds internal matching & transit engine"),
-        ("Institutional Onboarding", "Bespoke Sandbox API Keys: desk@prism.xyz"),
+        ("Institutional Onboarding", "Bespoke Production Sandbox API Keys: desk@prism.xyz"),
     ]
     for r_i, (k, v) in enumerate(specs):
         c1 = spec_table.cell(r_i, 0)
         c2 = spec_table.cell(r_i, 1)
-        set_cell_background(c1, "F1F5F9")
+        set_cell_background(c1, "F8FAFC")
         set_cell_background(c2, "FFFFFF")
-        set_cell_margins(c1, top=60, bottom=60, left=100, right=100)
-        set_cell_margins(c2, top=60, bottom=60, left=100, right=100)
+        set_cell_margins(c1, top=70, bottom=70, left=120, right=120)
+        set_cell_margins(c2, top=70, bottom=70, left=120, right=120)
         
         p1 = c1.paragraphs[0]
         r1 = p1.add_run(k)
-        r1.font.name = "Arial"
-        r1.font.size = Pt(8.5)
+        r1.font.name = FONT_FAMILY
+        r1.font.size = Pt(9)
         r1.font.bold = True
         r1.font.color.rgb = RGBColor(15, 23, 42)
 
         p2 = c2.paragraphs[0]
         r2 = p2.add_run(v)
-        r2.font.name = "Arial"
-        r2.font.size = Pt(8.5)
+        r2.font.name = FONT_FAMILY
+        r2.font.size = Pt(9)
         r2.font.color.rgb = RGBColor(30, 41, 59)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(14)
     fin = doc.add_paragraph()
-    r_fin = fin.add_run("PRISM TECHNOLOGIES INC.  |  EXECUTION IS SOVEREIGNTY.\nSecaucus NY4 • London LD4 • Singapore SG1  |  Contact: desk@prism.xyz")
-    r_fin.font.name = "Arial"
+    r_fin = fin.add_run("PRISM TECHNOLOGIES INC.   |   EXECUTION IS SOVEREIGNTY.\nSecaucus NY4  •  London LD4  •  Singapore SG1   |   Contact: desk@prism.xyz")
+    r_fin.font.name = FONT_FAMILY
     r_fin.font.size = Pt(8.5)
     r_fin.font.bold = True
     r_fin.font.color.rgb = RGBColor(100, 116, 139)
