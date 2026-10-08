@@ -1,5 +1,5 @@
 # VOLUME IV: GEOPOLITICS, COMPUTE, AND CIVILIZATION ENERGY
-*By Harsha Ghandikota | PRISM Technologies Inc.*
+*By Harsha Ghandikota | PRISM Liquidity Systems*
 
 ---
 

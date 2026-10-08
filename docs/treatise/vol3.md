@@ -1,5 +1,5 @@
 # VOLUME III: THE AGENTIC SOVEREIGN & THE SOLO CAPITALIST
-*By Harsha Ghandikota | PRISM Technologies Inc.*
+*By Harsha Ghandikota | PRISM Liquidity Systems*
 
 ---
 

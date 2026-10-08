@@ -1,5 +1,5 @@
 # VOLUME II: THE MICROSTRUCTURE OF REALITY
-*By Harsha Ghandikota | PRISM Technologies Inc.*
+*By Harsha Ghandikota | PRISM Liquidity Systems*
 
 ---
 

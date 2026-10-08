@@ -1,5 +1,5 @@
 # VOLUME V: THE PRISM ROADMAP & THE DECADE OF LIQUID TRUTH
-*By Harsha Ghandikota | PRISM Technologies Inc.*
+*By Harsha Ghandikota | PRISM Liquidity Systems*
 
 ---
 
@@ -108,7 +108,7 @@ When truth has a liquid, un-censorable, multi-venue clearing price, civilization
 
 ```
 A LETTER FROM HARSHA GHANDIKOTA
-Founder & Architect, PRISM Technologies Inc.
+Founder & Architect, PRISM Liquidity Systems
 October 2026
 
 To my family, my peers, and those who allocate capital in an uncertain world:

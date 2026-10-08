@@ -1,5 +1,5 @@
 # VOLUME I: THE EPISTEMIC CRISIS & THE COLLAPSE OF CONSENSUS
-*By Harsha Ghandikota | PRISM Technologies Inc.*
+*By Harsha Ghandikota | PRISM Liquidity Systems*
 
 ---
 
